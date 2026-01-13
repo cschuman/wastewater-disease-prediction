@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { PageData } from './$types';
-	import { Badge } from '$lib/components/ui/index';
+	import { Badge } from '$lib/components/ui/index.js';
 	import { formatPopulation, formatNumber } from '$lib/utils/formatters';
 	import type { County } from '$lib/types';
 
