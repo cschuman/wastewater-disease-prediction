@@ -1,8 +1,8 @@
 <script lang="ts">
 	import type { PageData } from './$types';
-	import { MetricCard, Badge } from '$lib/components/ui';
-	import { QuartileBarChart } from '$lib/components/charts';
-	import { MiniMap } from '$lib/components/map';
+	import { MetricCard, Badge } from '$lib/components/ui/index';
+	import { QuartileBarChart } from '$lib/components/charts/index';
+	import { MiniMap } from '$lib/components/map/index';
 	import { formatPopulation, formatNumber } from '$lib/utils/formatters';
 
 	let { data }: { data: PageData } = $props();
