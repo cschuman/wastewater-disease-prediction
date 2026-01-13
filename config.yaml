@@ -1,0 +1,86 @@
+# Wastewater Disease Prediction - Project Configuration
+
+# Data source endpoints
+data_sources:
+  nwss:
+    domain: "data.cdc.gov"
+    datasets:
+      metrics:
+        id: "2ew6-ywp6"
+        description: "NWSS Public SARS-CoV-2 Wastewater Metric Data"
+      concentration:
+        id: "g653-rqe2"
+        description: "NWSS Public SARS-CoV-2 Concentration Data"
+
+  nhsn:
+    weekly_respiratory:
+      url: "https://data.cdc.gov/api/views/ua7e-t2fy/rows.csv?accessType=DOWNLOAD"
+      description: "Weekly Hospital Respiratory Data"
+    historical_capacity:
+      url: "https://healthdata.gov/api/views/g62h-syeh/rows.csv?accessType=DOWNLOAD"
+      description: "Historical Hospital Capacity (through May 2024)"
+
+# Pathogens to track
+pathogens:
+  - name: "SARS-CoV-2"
+    alias: "covid"
+    available_since: "2020-09"
+  - name: "Influenza A"
+    alias: "flu_a"
+    available_since: "2022-10"
+  - name: "Influenza B"
+    alias: "flu_b"
+    available_since: "2022-10"
+  - name: "RSV"
+    alias: "rsv"
+    available_since: "2023-09"
+
+# Target variable configuration
+target:
+  name: "total_respiratory_admissions"
+  components:
+    - "covid_admissions"
+    - "flu_admissions"
+    - "rsv_admissions"
+  stratification:
+    - "age_group"  # pediatric, adult, elderly
+    - "jurisdiction"  # state-level
+
+# Feature engineering settings
+features:
+  lags: [1, 2, 3, 4]  # weeks
+  rolling_windows: [2, 4]  # weeks
+  include_weather: true
+  include_vaccination: true
+  include_svi: true  # Social Vulnerability Index
+
+# Model training settings
+training:
+  test_size: 0.2
+  validation_strategy: "temporal"  # or "geographic"
+  forecast_horizons: [1, 2, 3, 4]  # weeks ahead
+  random_seed: 42
+
+# Evaluation metrics
+evaluation:
+  primary_metric: "mae"
+  metrics:
+    - "mae"
+    - "mape"
+    - "rmse"
+    - "wis"  # Weighted Interval Score
+    - "coverage_95"  # 95% prediction interval coverage
+
+# Paths (relative to project root)
+paths:
+  raw_data: "data/raw"
+  processed_data: "data/processed"
+  external_data: "data/external"
+  models: "models"
+  reports: "reports"
+  notebooks: "notebooks"
+
+# Logging
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"

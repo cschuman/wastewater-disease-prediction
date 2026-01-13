@@ -1,0 +1,54 @@
+================================================================================
+WASTEWATER SURVEILLANCE EQUITY GAP TRAJECTORY ANALYSIS
+Analysis Date: 2026-01-11
+================================================================================
+
+### OVERALL STATISTICS ###
+
+Total monitoring sites analyzed: 1,187
+Sites with SVI data: 1,153
+Time period: 2020-07-05 to 2025-08-26
+
+### EXPANSION BY SVI QUARTILE ###
+
+                   total_sites  population_served  2024+  Pre-2024  pct_new_2024  sites_per_100k
+svi_quartile                                                                                    
+Q1 (Lowest SVI)            230           18955094    116       114          50.4            0.65
+Q2 (Low-Mid SVI)           331           34626729    187       144          56.5            0.39
+Q3 (Mid-High SVI)          363           39121092    186       177          51.2            0.54
+Q4 (Highest SVI)           229           30898411    122       107          53.3            0.16
+
+
+### KEY FINDINGS ###
+
+1. CURRENT EQUITY GAP
+   - Q1 (Lowest SVI) states: 230 sites
+   - Q4 (Highest SVI) states: 229 sites
+   - Gap Ratio: 1.00x (Q1 has 1.00x more sites than Q4)
+
+2. 2024+ EXPANSION PATTERN
+   - Q1 states added: 116 sites (50.4% of their total)
+   - Q4 states added: 122 sites (53.3% of their total)
+   - 2024+ Gap Ratio: 0.95x
+
+3. GAP TRAJECTORY
+   - Initial gap ratio (early period): nanx
+   - Current gap ratio: 1.00x
+   - Gap change: +0.0%
+   - Trajectory: STABLE
+   - Interpretation: The gap is relatively stable - expansion is proportional.
+
+4. PER CAPITA DISPARITY
+   - Q1 states: 0.65 sites per 100k population
+   - Q4 states: 0.16 sites per 100k population
+   - Disparity ratio: 4.06x
+
+### ANSWER TO KEY QUESTION ###
+
+IS THE EQUITY GAP CLOSING OR WIDENING?
+--------------------------------------------------------------------------------
+The equity gap is STABLE. While substantial expansion occurred in 2024-2025,
+the growth has been proportional across SVI quartiles, maintaining existing
+disparities rather than closing them.
+
+================================================================================

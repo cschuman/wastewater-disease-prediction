@@ -1,0 +1,384 @@
+================================================================================
+WASTEWATER SURVEILLANCE EQUITY SIMULATION
+Modeling What Equitable Coverage Would Require
+================================================================================
+
+[1/6] Loading data...
+Loaded SVI for 3,144 counties
+Wastewater data for 684 counties
+
+Baseline dataset: 3,144 counties
+Counties with monitoring: 678 (21.6%)
+Population covered: 59726.7M (18039.0%)
+
+[2/6] Analyzing current coverage by SVI...
+
+Current Coverage by SVI Quartile:
+SVI Quartile  N Counties  Total Pop (M)  Counties w/ Monitoring  % Counties w/ Monitoring  Total Sites  Sites per Million  Pop Served (M)  % Pop Covered
+    Q1 (Low)         786           46.9                     157                      20.0          247               4.79          5993.3        12787.1
+          Q2         786           76.4                     208                      26.5          326               6.44         16520.7        21632.8
+          Q3         786           93.1                     179                      22.8          318               4.24         14207.2        15256.0
+   Q4 (High)         786          114.7                     134                      17.0          255               3.22         23005.5        20051.2
+
+[3/6] Running equity scenarios...
+
+================================================================================
+SCENARIO A: Equalize Sites Per Capita Across SVI Quartiles
+================================================================================
+
+Current coverage rates:
+  Q1 (Low): 4.79 sites/million
+  Q2: 6.44 sites/million
+  Q3: 4.24 sites/million
+  Q4 (High): 3.22 sites/million
+
+Target rate (Q1 benchmark): 4.79 sites per million
+
+--------------------------------------------------------------------------------
+TOTAL NEW SITES NEEDED: 799
+Setup cost: $79.9M
+5-year total cost: $279.6M
+--------------------------------------------------------------------------------
+
+Distribution by SVI quartile:
+SVI Quartile  New Sites Needed  Population  N Counties  % of New Sites
+    Q1 (Low)                80    46870048         786            10.0
+          Q2               157    76368716         786            19.6
+          Q3               237    93124942         786            29.7
+   Q4 (High)               325   114733887         786            40.7
+
+Top 15 states by new sites needed:
+State  New Sites  Population  N Counties  Setup Cost ($M)
+   CA        184    39356104          58             18.4
+   FL         86    21634529          67              8.6
+   TX         69    29243342         254              6.9
+   PA         36    12989208          67              3.6
+   MI         30    10057921          83              3.0
+   AZ         27     7172282          15              2.7
+   MA         27     6984205          14              2.7
+   NJ         24     9249063          21              2.4
+   GA         22    10722325         159              2.2
+   TN         20     6923772          95              2.0
+   MD         20     6161707          24              2.0
+   NY         19    19994379          62              1.9
+   OH         19    11774683          88              1.9
+   NC         18    10470214         100              1.8
+   IL         18    12757634         102              1.8
+
+================================================================================
+SCENARIO B: Prioritize High-SVI Counties with Zero Coverage
+================================================================================
+
+High-SVI counties (Q3 + Q4): 1,572
+Counties needing additional sites: 1,367
+Counties with ZERO coverage: 1,259
+
+--------------------------------------------------------------------------------
+TOTAL NEW SITES NEEDED: 1,720
+Setup cost: $172.0M
+5-year total cost: $602.0M
+--------------------------------------------------------------------------------
+
+Top 20 priority counties:
+State             County  Pop (k)    SVI  Current Sites  New Sites Needed
+   LA     Madison Parish       10 1.0000              0                 1
+   TX      Dimmit County        9 0.9994              0                 1
+   LA  Evangeline Parish       32 0.9990              0                 1
+   AR      Chicot County       10 0.9987              0                 1
+   FL      DeSoto County       34 0.9981              0                 1
+   MS       Yazoo County       27 0.9975              0                 1
+   MS  Washington County       45 0.9971              0                 1
+   TX      Zapata County       14 0.9968              0                 1
+   NC     Robeson County      118 0.9962              0                 2
+   SC   Allendale County        8 0.9955              0                 1
+   TX Nacogdoches County       65 0.9952              0                 1
+   LA   Concordia Parish       19 0.9949              0                 1
+   FL      Hendry County       40 0.9946              0                 1
+   TX    Hudspeth County        3 0.9943              0                 1
+   MS     Bolivar County       31 0.9940              0                 1
+   CA    Imperial County      180 0.9936              0                 2
+   TX    Presidio County        6 0.9933              0                 1
+   FL      Hardee County       26 0.9930              0                 1
+   TX     Kleberg County       31 0.9924              0                 1
+   MS      Holmes County       17 0.9920              0                 1
+
+Top 15 states by new sites needed:
+State  New Sites  N Counties  Population  Setup Cost ($M)
+   TX        225         193    18296873             22.5
+   CA        157          45    33627237             15.7
+   GA        126         117     6101040             12.6
+   FL         97          55    17464308              9.7
+   MS         76          75     2236399              7.6
+   KY         73          71     2040150              7.3
+   NC         71          60     5168723              7.1
+   LA         65          55     3615722              6.5
+   OK         63          57     3308316              6.3
+   AR         62          58     1885850              6.2
+   TN         62          55     4160036              6.2
+   AL         47          43     2499820              4.7
+   VA         41          40     1461637              4.1
+   MO         40          39     1889765              4.0
+   SC         38          31     2587163              3.8
+
+================================================================================
+SCENARIO C: Target 50% Population Coverage Threshold
+================================================================================
+
+Current status:
+Counties below 50% coverage: 2,466 (78.4%)
+Population in counties below threshold: 157.8M
+
+--------------------------------------------------------------------------------
+TOTAL NEW SITES NEEDED: 2,845
+Setup cost: $284.5M
+5-year total cost: $995.8M
+--------------------------------------------------------------------------------
+
+Impact by SVI quartile:
+SVI Quartile  New Sites  Population  Counties Below Threshold  % of New Sites
+    Q1 (Low)        662    46870048                         0            23.3
+          Q2        657    76368716                         0            23.1
+          Q3        742    93124942                         0            26.1
+   Q4 (High)        784   114733887                         0            27.6
+
+Top 20 counties with largest coverage gaps:
+State            County  Pop (k)  Current Cov %    SVI  Current Sites  New Sites
+   AL    Autauga County       59            0.0 0.2663              0          1
+   OH Columbiana County      102            0.0 0.4162              0          1
+   OH      Adams County       28            0.0 0.6516              0          1
+   OH    Ashland County       53            0.0 0.3096              0          1
+   OH   Auglaize County       46            0.0 0.0261              0          1
+   OH      Brown County       44            0.0 0.3691              0          1
+   OH  Champaign County       39            0.0 0.1123              0          1
+   OH   Clermont County      209            0.0 0.1479              0          2
+   OH    Clinton County       42            0.0 0.3038              0          1
+   OH   Delaware County      216            0.0 0.0239              0          2
+   OH    Jackson County       33            0.0 0.5663              0          1
+   OH  Fairfield County      159            0.0 0.1960              0          1
+   OH     Gallia County       29            0.0 0.6010              0          1
+   OH     Geauga County       95            0.0 0.0961              0          1
+   OH   Guernsey County       38            0.0 0.5352              0          1
+   OH   Harrison County       15            0.0 0.5262              0          1
+   OH      Henry County       28            0.0 0.0977              0          1
+   OH   Highland County       43            0.0 0.4763              0          1
+   ND   Williams County       39            0.0 0.5062              0          1
+   ND      Wells County        4            0.0 0.2437              0          1
+
+Top 15 states by new sites needed:
+State  New Sites  N Counties  Population  Setup Cost ($M)
+   TX        253         227    11967838             25.3
+   CA        182          57    29419414             18.2
+   GA        151         144     6191662             15.1
+   VA        110         102     4928871             11.0
+   KY        106         106     2604098             10.6
+   FL        105          59    13849951             10.5
+   TN        103          94     5997332             10.3
+   KS        101          99     1743431             10.1
+   IA         92          90     2352181              9.2
+   OK         83          76     3908041              8.3
+   NC         82          77     5104686              8.2
+   MO         81          81     1539973              8.1
+   MS         80          79     2532412              8.0
+   NE         78          78      682556              7.8
+   MI         76          67     5373319              7.6
+
+[4/6] Creating priority investment map...
+
+================================================================================
+PRIORITY INVESTMENT MAP: Unified Recommendations
+================================================================================
+
+Top 30 Priority Counties for Investment:
+State                County  Pop (k)    SVI SVI Quartile  Current Sites  Coverage %  Priority Score             Tier
+   CA    Los Angeles County     9937 0.8629    Q4 (High)              1       100.0            75.2 Tier 1 (Highest)
+   AZ       Maricopa County     4431 0.7130           Q3              0         0.0            57.0 Tier 1 (Highest)
+   TX          Bexar County     2014 0.9192    Q4 (High)              0         0.0            55.9 Tier 1 (Highest)
+   CA San Bernardino County     2181 0.8858    Q4 (High)              0         0.0            55.4 Tier 1 (Highest)
+   CA      Riverside County     2429 0.8199    Q4 (High)              0         0.0            53.9 Tier 1 (Highest)
+   TX        El Paso County      864 0.9825    Q4 (High)              0         0.0            53.8 Tier 1 (Highest)
+   CA         Fresno County     1008 0.9618    Q4 (High)              0         0.0            53.7 Tier 1 (Highest)
+   CA           Kern County      907 0.9685    Q4 (High)              0         0.0            53.5 Tier 1 (Highest)
+   CA      San Diego County     3290 0.7057           Q3              0         0.0            52.9 Tier 1 (Highest)
+   NJ          Essex County      853 0.9415    Q4 (High)              0         0.0            52.3 Tier 1 (Highest)
+   TX        Cameron County      422 0.9844    Q4 (High)              0         0.0            51.8 Tier 1 (Highest)
+   FL        Broward County     1941 0.7814    Q4 (High)              0         0.0            50.9 Tier 1 (Highest)
+   NY          Bronx County     1443 0.9965    Q4 (High)              2       100.0            50.8 Tier 1 (Highest)
+   CA         Merced County      282 0.9730    Q4 (High)              0         0.0            50.6 Tier 1 (Highest)
+   CA       Imperial County      180 0.9936    Q4 (High)              0         0.0            50.6 Tier 1 (Highest)
+   NC        Robeson County      118 0.9962    Q4 (High)              0         0.0            50.1 Tier 1 (Highest)
+   FL           Polk County      736 0.8912    Q4 (High)              0         0.0            50.1 Tier 1 (Highest)
+   TX           Bell County      373 0.9370    Q4 (High)              0         0.0            49.9 Tier 1 (Highest)
+   TX         Nueces County      353 0.9351    Q4 (High)              0         0.0            49.7 Tier 1 (Highest)
+   CA         Tulare County      473 0.9147    Q4 (High)              0         0.0            49.7 Tier 1 (Highest)
+   CA    San Joaquin County      779 0.8718    Q4 (High)              0         0.0            49.6 Tier 1 (Highest)
+   TX       Angelina County       87 0.9917    Q4 (High)              0         0.0            49.6 Tier 1 (Highest)
+   IL           Cook County     5225 0.7964    Q4 (High)             10       100.0            49.5 Tier 1 (Highest)
+   AZ         Navajo County      107 0.9806    Q4 (High)              0         0.0            49.4 Tier 1 (Highest)
+   FL     Miami-Dade County     2688 0.8810    Q4 (High)              4       100.0            49.4 Tier 1 (Highest)
+   GA           Bibb County      157 0.9644    Q4 (High)              0         0.0            49.4 Tier 1 (Highest)
+   TX    Nacogdoches County       65 0.9952    Q4 (High)              0         0.0            49.3 Tier 1 (Highest)
+   CA         Madera County      157 0.9593    Q4 (High)              0         0.0            49.2 Tier 1 (Highest)
+   TX          Starr County       66 0.9905    Q4 (High)              0         0.0            49.2 Tier 1 (Highest)
+   NM       San Juan County      122 0.9669    Q4 (High)              0         0.0            49.1 Tier 1 (Highest)
+
+Priority tier distribution:
+   Priority Tier  N Counties  Population  Current Sites  % of US Population
+    Tier 4 (Low)         786    39085923            296                11.8
+          Tier 3         786    69581487            337                21.0
+          Tier 2         786    81751855            286                24.7
+Tier 1 (Highest)         786   140678328            227                42.5
+
+[5/6] Generating policy recommendations...
+
+================================================================================
+ACTIONABLE POLICY RECOMMENDATIONS
+================================================================================
+
+EXECUTIVE SUMMARY
+-----------------
+Current State:
+  • 3,144 US counties tracked
+  • 678 counties have wastewater monitoring (21.6%)
+  • 1,259 high-SVI counties have ZERO coverage
+  • High-SVI states have 44% fewer monitoring sites per capita
+
+The Equity Gap:
+  • Low-SVI counties: 4.8 sites per million
+  • High-SVI counties: 3.2 sites per million
+  • This 1.5x disparity leaves vulnerable communities underserved
+
+
+RECOMMENDED INVESTMENT SCENARIOS
+---------------------------------
+
+Option 1: FULL EQUITY (Scenario A)
+  Objective: Equalize sites per capita to match low-SVI counties
+
+  Investment Required:
+    • 799 new monitoring sites
+    • $80M setup costs
+    • $280M total 5-year cost
+
+  Impact:
+    • Eliminates the equity gap entirely
+    • Brings all communities to the same monitoring standard
+    • 325 sites to highest-SVI counties
+
+  Timeline: 5-7 years (phased rollout by priority tier)
+
+
+Option 2: TARGETED PRIORITY (Scenario B) ⭐ RECOMMENDED
+  Objective: Ensure all high-SVI counties have minimum monitoring
+
+  Investment Required:
+    • 1,720 new monitoring sites
+    • $172M setup costs
+    • $602M total 5-year cost
+
+  Impact:
+    • Closes the most critical gaps with ~215% of full equity cost
+    • Prioritizes 1,259 high-SVI counties with zero coverage
+    • Addresses the most urgent public health needs
+
+  Timeline: 3-5 years (focused implementation)
+
+
+Option 3: BASELINE STANDARD (Scenario C)
+  Objective: Ensure 50% population coverage in every county
+
+  Investment Required:
+    • 2,845 new monitoring sites
+    • $284M setup costs
+    • $996M total 5-year cost
+
+  Impact:
+    • Establishes minimum public health monitoring floor
+    • 2,466 counties currently below threshold
+    • Balances equity with feasibility
+
+  Timeline: 3-5 years
+
+
+IMPLEMENTATION ROADMAP (Based on Scenario B - Recommended)
+-----------------------------------------------------------
+
+Phase 1 (Year 1): High-Priority, Zero-Coverage Counties
+  • Target: 1,259 high-SVI counties with no monitoring
+  • Focus: Top priority tier counties (largest, highest SVI)
+  • Sites: ~602 new sites
+  • Cost: $60M
+
+Phase 2 (Years 2-3): Expand Coverage in High-SVI Areas
+  • Target: Q3/Q4 counties with below-target coverage
+  • Sites: ~688 new sites
+  • Cost: $69M
+
+Phase 3 (Years 4-5): Address Remaining Gaps
+  • Target: All remaining counties below national average
+  • Sites: ~430 new sites
+  • Cost: $43M
+
+
+TOP 10 STATES FOR PRIORITY INVESTMENT
+--------------------------------------
+(Based on Scenario B - number of new sites needed)
+
+  42. TX: 225 sites, $22M
+  5. CA: 157 sites, $16M
+  11. GA: 126 sites, $13M
+  10. FL: 97 sites, $10M
+  26. MS: 76 sites, $8M
+  18. KY: 73 sites, $7M
+  28. NC: 71 sites, $7M
+  19. LA: 65 sites, $6M
+  36. OK: 63 sites, $6M
+  3. AR: 62 sites, $6M
+
+
+POLICY LEVERS FOR IMPLEMENTATION
+---------------------------------
+
+1. Federal Funding Mechanisms
+   • CDC Epidemiology and Laboratory Capacity (ELC) grants
+   • EPA Water Infrastructure Improvements for the Nation (WIIN) Act
+   • Create dedicated wastewater surveillance equity fund
+
+2. State-Federal Partnerships
+   • Require equity plans for federal wastewater funding
+   • Incentivize state matching for high-SVI county sites
+   • Technical assistance for rural/under-resourced communities
+
+3. Public-Private Collaboration
+   • Partner with utilities in underserved areas
+   • Academic-community partnerships for site operations
+   • Shared infrastructure with existing environmental monitoring
+
+4. Performance Metrics
+   • Track coverage equity by SVI quartile annually
+   • Set state-level targets for high-SVI county coverage
+   • Public dashboard showing progress toward equity goals
+
+
+KEY TAKEAWAY
+------------
+Closing the wastewater surveillance equity gap is achievable with targeted
+investment of $172M setup + $602M over 5 years.
+
+This investment would ensure that vulnerable communities - those most likely
+to experience severe disease burden - have equal access to early warning
+systems that can save lives and prevent outbreaks.
+
+The cost of NOT acting: continued health disparities, delayed outbreak
+detection in vulnerable communities, and preventable disease transmission.
+
+
+[6/6] Saving outputs...
+
+Outputs saved to reports/equity_simulation/
+  • county_priority_rankings.csv - All counties with priority scores
+  • scenario_comparison.csv - Summary of all scenarios
+  • top_priority_counties.csv - Top 50 priority counties for investment
+
+================================================================================
+EQUITY SIMULATION COMPLETE
+================================================================================

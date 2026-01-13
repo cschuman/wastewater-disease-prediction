@@ -1,0 +1,87 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "wastewater-disease-prediction"
+version = "0.1.0"
+description = "Predictive modeling using wastewater surveillance data to forecast disease outbreaks"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+authors = [
+    {name = "Your Name", email = "your.email@example.com"}
+]
+keywords = [
+    "wastewater",
+    "epidemiology",
+    "forecasting",
+    "machine-learning",
+    "public-health"
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Medical Science Apps.",
+]
+dependencies = [
+    "pandas>=2.0.0",
+    "numpy>=1.24.0",
+    "requests>=2.31.0",
+    "sodapy>=2.2.0",
+    "scikit-learn>=1.3.0",
+    "xgboost>=2.0.0",
+    "statsmodels>=0.14.0",
+    "pyyaml>=6.0.0",
+    "tqdm>=4.66.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+    "jupyter>=1.0.0",
+    "jupyterlab>=4.0.0",
+]
+deep = [
+    "torch>=2.1.0",
+    "pytorch-forecasting>=1.0.0",
+    "pytorch-lightning>=2.1.0",
+]
+viz = [
+    "matplotlib>=3.8.0",
+    "seaborn>=0.13.0",
+    "plotly>=5.18.0",
+    "folium>=0.15.0",
+]
+all = [
+    "wastewater-disease-prediction[dev,deep,viz]",
+]
+
+[project.scripts]
+fetch-nwss = "scripts.fetch_nwss_data:main"
+fetch-nhsn = "scripts.fetch_nhsn_data:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*", "scripts*"]
+
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+select = ["E", "F", "I", "N", "W", "UP"]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-v --tb=short"

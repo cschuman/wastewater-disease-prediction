@@ -1,0 +1,36 @@
+@import 'tailwindcss';
+
+/* Custom theme variables */
+@theme {
+  /* SVI quartile colors */
+  --color-svi-q1: #2563eb; /* Low vulnerability - blue */
+  --color-svi-q2: #16a34a; /* Low-mid - green */
+  --color-svi-q3: #f59e0b; /* Mid-high - amber */
+  --color-svi-q4: #dc2626; /* High vulnerability - red */
+
+  /* Priority tier colors */
+  --color-tier-1: #dc2626; /* Highest priority */
+  --color-tier-2: #f59e0b;
+  --color-tier-3: #2563eb;
+
+  /* Custom spacing */
+  --spacing-18: 4.5rem;
+}
+
+/* Base styles */
+html {
+  font-family:
+    'Inter',
+    ui-sans-serif,
+    system-ui,
+    sans-serif;
+}
+
+body {
+  @apply bg-gray-50 text-gray-900;
+}
+
+/* Typography utilities */
+.text-balance {
+  text-wrap: balance;
+}

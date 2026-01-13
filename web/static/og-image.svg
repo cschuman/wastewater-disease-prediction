@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <!-- Background gradient -->
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#dc2626"/>
+      <stop offset="100%" style="stop-color:#f59e0b"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Content area -->
+  <rect x="40" y="40" width="1120" height="550" rx="20" fill="white" fill-opacity="0.95"/>
+
+  <!-- Title -->
+  <text x="600" y="150" font-size="56" text-anchor="middle" fill="#1f2937" font-family="system-ui, sans-serif" font-weight="bold">Wastewater Surveillance</text>
+  <text x="600" y="220" font-size="56" text-anchor="middle" fill="#1f2937" font-family="system-ui, sans-serif" font-weight="bold">Equity Gap</text>
+
+  <!-- Key stat -->
+  <text x="600" y="340" font-size="120" text-anchor="middle" fill="#dc2626" font-family="system-ui, sans-serif" font-weight="bold">58%</text>
+  <text x="600" y="400" font-size="32" text-anchor="middle" fill="#4b5563" font-family="system-ui, sans-serif">fewer monitoring sites per capita</text>
+  <text x="600" y="450" font-size="32" text-anchor="middle" fill="#4b5563" font-family="system-ui, sans-serif">in high-vulnerability counties</text>
+
+  <!-- Footer -->
+  <text x="600" y="540" font-size="24" text-anchor="middle" fill="#6b7280" font-family="system-ui, sans-serif">Explore data for 3,144 US counties</text>
+</svg>

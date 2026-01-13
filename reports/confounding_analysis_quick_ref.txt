@@ -1,0 +1,80 @@
+================================================================================
+URBAN/RURAL CONFOUNDING ANALYSIS - QUICK REFERENCE
+================================================================================
+
+RESEARCH QUESTION:
+  Is the SVI-monitoring gap confounded by urbanization?
+  (Rural areas have less sewer infrastructure → could explain the gap)
+
+ANSWER:
+  PARTIAL CONFOUNDING - Gap is real but urbanization-dependent
+  
+  ✓ SVI effect PERSISTS after controlling for urban/rural (p=0.007)
+  ✓ Effect reduced by only 11% (not eliminated)
+  ✓ Gap exists ONLY in urban counties (β=-0.74, p=0.0002)
+  ✓ No gap in rural counties (all have low coverage)
+
+================================================================================
+
+KEY STATISTICS:
+
+  1. SVI-Urbanization Correlation
+     r = 0.012 (p=0.51)  →  Nearly INDEPENDENT
+
+  2. Baseline Model (no control)
+     Sites per 100k ~ SVI
+     β = -0.811, p=0.022, R²=0.008
+
+  3. Controlled Model (+ RUCC)
+     Sites per 100k ~ SVI + RUCC
+     β = -0.721, p=0.007, R²=0.441
+     Change: -11%  →  PERSISTS
+
+  4. Stratified by Urbanization
+     
+     Urban counties (n=422):
+       β = -0.739, p=0.0002 ***  →  STRONG EFFECT
+     
+     Rural counties (n=256):
+       β = -0.478, p=0.524       →  NO EFFECT
+
+================================================================================
+
+INTERPRETATION:
+
+  The equity gap is NOT simply rural areas lacking infrastructure.
+  
+  Even among URBAN counties with wastewater treatment plants,
+  socially vulnerable communities have fewer monitoring sites.
+  
+  This indicates DIFFERENTIAL RESOURCE ALLOCATION within urban
+  infrastructure systems, not just rural infrastructure limitations.
+
+================================================================================
+
+POLICY IMPLICATION:
+
+  Target URBAN high-SVI counties for wastewater monitoring expansion.
+  
+  The gap is not about building sewers in rural areas—it's about
+  equitable allocation of monitoring resources in existing urban systems.
+
+================================================================================
+
+STATISTICAL CONCLUSION:
+
+  Classification: PARTIAL CONFOUNDING
+  
+  Criteria:
+    ✓ Coefficient changed >10%     (11% reduction)
+    ✓ Effect remains significant   (p=0.007)
+    ✓ Confounder explains variance (ΔR²=0.433)
+  
+  Urbanization is a confounder that explains PART of the variance,
+  but the SVI-monitoring gap is REAL and independent of urbanization.
+
+================================================================================
+
+Files: src/analysis/urban_rural_confounding.py
+       data/processed/county_svi_rucc_monitoring.csv
+       reports/urban_rural_confounding_summary.md

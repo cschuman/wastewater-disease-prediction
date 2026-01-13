@@ -1,0 +1,12 @@
+{
+  "total_counties": 3144,
+  "total_population": 331097593,
+  "total_sites": 1146,
+  "counties_with_monitoring": 678,
+  "coverage_pct": 21.6,
+  "high_svi_zero_coverage": 652,
+  "q1_sites_per_million": 5.27,
+  "q4_sites_per_million": 2.22,
+  "disparity_pct": 57.8,
+  "analysis_date": "2026-01-11"
+}
