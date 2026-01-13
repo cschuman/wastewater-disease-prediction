@@ -1,0 +1,39 @@
+cff-version: 1.2.0
+title: Wastewater Disease Prediction
+message: >-
+  If you use this software in your research, please cite it
+  using the metadata from this file.
+type: software
+authors:
+  - name: Wastewater Disease Prediction Contributors
+repository-code: https://github.com/cschuman/wastewater-disease-prediction
+url: https://github.com/cschuman/wastewater-disease-prediction
+abstract: >-
+  Multi-pathogen respiratory disease forecasting using CDC
+  wastewater surveillance data to predict hospital
+  admissions. Combines NWSS wastewater signals with NHSN
+  hospitalization data to provide early warning of
+  respiratory disease burden.
+keywords:
+  - wastewater surveillance
+  - epidemiology
+  - disease forecasting
+  - public health
+  - machine learning
+  - COVID-19
+  - influenza
+  - RSV
+license: MIT
+version: 0.1.0
+date-released: "2025-01-13"
+references:
+  - type: dataset
+    title: NWSS Public SARS-CoV-2 Wastewater Metric Data
+    authors:
+      - name: Centers for Disease Control and Prevention
+    url: https://data.cdc.gov/Public-Health-Surveillance/NWSS-Public-SARS-CoV-2-Wastewater-Metric-Data/2ew6-ywp6
+  - type: dataset
+    title: Weekly Hospital Respiratory Data
+    authors:
+      - name: Centers for Disease Control and Prevention
+    url: https://healthdata.gov/dataset/Weekly-Hospital-Respiratory-Data-HRD-Metrics-by-Ju/n3kj-exp9
