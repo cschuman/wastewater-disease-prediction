@@ -69,12 +69,14 @@ class TestHospWwRatios:
         from src.analysis.health_equity_ratios import calculate_hosp_ww_ratios
 
         # Create sample data
-        df = pd.DataFrame({
-            "state": ["CA"] * 20 + ["TX"] * 20,
-            "week_end_date": list(pd.date_range("2024-01-01", periods=20, freq="W")) * 2,
-            "ww_percentile": np.random.uniform(30, 70, 40),
-            "covid_hosp": np.random.randint(100, 500, 40),
-        })
+        df = pd.DataFrame(
+            {
+                "state": ["CA"] * 20 + ["TX"] * 20,
+                "week_end_date": list(pd.date_range("2024-01-01", periods=20, freq="W")) * 2,
+                "ww_percentile": np.random.uniform(30, 70, 40),
+                "covid_hosp": np.random.randint(100, 500, 40),
+            }
+        )
 
         results = calculate_hosp_ww_ratios(df, lag_weeks=1)
 
@@ -91,12 +93,14 @@ class TestHospWwRatios:
         ww = np.random.uniform(30, 70, 20)
         hosp = ww * 5 + np.random.normal(0, 10, 20)  # Correlated with noise
 
-        df = pd.DataFrame({
-            "state": ["CA"] * 20,
-            "week_end_date": pd.date_range("2024-01-01", periods=20, freq="W"),
-            "ww_percentile": ww,
-            "covid_hosp": hosp,
-        })
+        df = pd.DataFrame(
+            {
+                "state": ["CA"] * 20,
+                "week_end_date": pd.date_range("2024-01-01", periods=20, freq="W"),
+                "ww_percentile": ww,
+                "covid_hosp": hosp,
+            }
+        )
 
         results = calculate_hosp_ww_ratios(df, lag_weeks=1)
 
@@ -113,23 +117,27 @@ class TestEquityPatterns:
         from src.analysis.health_equity_ratios import analyze_equity_patterns
 
         # Create sample ratio data
-        ratios_df = pd.DataFrame({
-            "state": ["CA", "TX", "NY", "FL", "OH", "PA", "IL", "GA"],
-            "hosp_ww_slope": [1.2, 1.5, 1.1, 1.3, 1.4, 1.0, 1.2, 1.6],
-            "hosp_ww_r": [0.7, 0.8, 0.6, 0.75, 0.65, 0.55, 0.7, 0.85],
-            "hosp_ww_r2": [0.49, 0.64, 0.36, 0.56, 0.42, 0.30, 0.49, 0.72],
-            "hosp_ww_pvalue": [0.01, 0.001, 0.05, 0.01, 0.02, 0.1, 0.01, 0.001],
-            "hosp_ww_mean_ratio": [5.0, 6.0, 4.5, 5.5, 5.2, 4.0, 5.0, 6.5],
-            "hosp_ww_ratio_cv": [0.2, 0.15, 0.25, 0.18, 0.22, 0.3, 0.2, 0.12],
-            "n_weeks": [18, 18, 18, 18, 18, 18, 18, 18],
-            "mean_hosp": [200, 300, 250, 280, 220, 190, 230, 320],
-            "mean_ww": [40, 50, 55, 50, 42, 47, 46, 49],
-        })
+        ratios_df = pd.DataFrame(
+            {
+                "state": ["CA", "TX", "NY", "FL", "OH", "PA", "IL", "GA"],
+                "hosp_ww_slope": [1.2, 1.5, 1.1, 1.3, 1.4, 1.0, 1.2, 1.6],
+                "hosp_ww_r": [0.7, 0.8, 0.6, 0.75, 0.65, 0.55, 0.7, 0.85],
+                "hosp_ww_r2": [0.49, 0.64, 0.36, 0.56, 0.42, 0.30, 0.49, 0.72],
+                "hosp_ww_pvalue": [0.01, 0.001, 0.05, 0.01, 0.02, 0.1, 0.01, 0.001],
+                "hosp_ww_mean_ratio": [5.0, 6.0, 4.5, 5.5, 5.2, 4.0, 5.0, 6.5],
+                "hosp_ww_ratio_cv": [0.2, 0.15, 0.25, 0.18, 0.22, 0.3, 0.2, 0.12],
+                "n_weeks": [18, 18, 18, 18, 18, 18, 18, 18],
+                "mean_hosp": [200, 300, 250, 280, 220, 190, 230, 320],
+                "mean_ww": [40, 50, 55, 50, 42, 47, 46, 49],
+            }
+        )
 
-        svi_df = pd.DataFrame({
-            "state": ["CA", "TX", "NY", "FL", "OH", "PA", "IL", "GA"],
-            "svi_score": [0.54, 0.58, 0.51, 0.55, 0.52, 0.47, 0.50, 0.59],
-        })
+        svi_df = pd.DataFrame(
+            {
+                "state": ["CA", "TX", "NY", "FL", "OH", "PA", "IL", "GA"],
+                "svi_score": [0.54, 0.58, 0.51, 0.55, 0.52, 0.47, 0.50, 0.59],
+            }
+        )
 
         results = analyze_equity_patterns(ratios_df, svi_df)
 
@@ -142,23 +150,27 @@ class TestEquityPatterns:
         """Test that SVI quartiles are properly created."""
         from src.analysis.health_equity_ratios import analyze_equity_patterns
 
-        ratios_df = pd.DataFrame({
-            "state": ["S" + str(i) for i in range(12)],
-            "hosp_ww_slope": np.random.uniform(0.5, 2.0, 12),
-            "hosp_ww_r": np.random.uniform(0.3, 0.9, 12),
-            "hosp_ww_r2": np.random.uniform(0.1, 0.8, 12),
-            "hosp_ww_pvalue": np.random.uniform(0.001, 0.1, 12),
-            "hosp_ww_mean_ratio": np.random.uniform(3, 8, 12),
-            "hosp_ww_ratio_cv": np.random.uniform(0.1, 0.4, 12),
-            "n_weeks": [18] * 12,
-            "mean_hosp": np.random.randint(150, 350, 12),
-            "mean_ww": np.random.uniform(35, 60, 12),
-        })
+        ratios_df = pd.DataFrame(
+            {
+                "state": ["S" + str(i) for i in range(12)],
+                "hosp_ww_slope": np.random.uniform(0.5, 2.0, 12),
+                "hosp_ww_r": np.random.uniform(0.3, 0.9, 12),
+                "hosp_ww_r2": np.random.uniform(0.1, 0.8, 12),
+                "hosp_ww_pvalue": np.random.uniform(0.001, 0.1, 12),
+                "hosp_ww_mean_ratio": np.random.uniform(3, 8, 12),
+                "hosp_ww_ratio_cv": np.random.uniform(0.1, 0.4, 12),
+                "n_weeks": [18] * 12,
+                "mean_hosp": np.random.randint(150, 350, 12),
+                "mean_ww": np.random.uniform(35, 60, 12),
+            }
+        )
 
-        svi_df = pd.DataFrame({
-            "state": ["S" + str(i) for i in range(12)],
-            "svi_score": np.linspace(0.2, 0.8, 12),  # Evenly distributed
-        })
+        svi_df = pd.DataFrame(
+            {
+                "state": ["S" + str(i) for i in range(12)],
+                "svi_score": np.linspace(0.2, 0.8, 12),  # Evenly distributed
+            }
+        )
 
         results = analyze_equity_patterns(ratios_df, svi_df)
 

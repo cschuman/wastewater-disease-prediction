@@ -30,6 +30,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class ModelResults:
     """Container for model evaluation results."""
+
     model_name: str
     mae: float
     rmse: float
@@ -43,15 +44,15 @@ def load_data(data_path: Path) -> pd.DataFrame:
     df = pd.read_parquet(data_path)
 
     # Ensure proper date sorting
-    date_col = 'week_end_date' if 'week_end_date' in df.columns else 'week_sat'
+    date_col = "week_end_date" if "week_end_date" in df.columns else "week_sat"
     df[date_col] = pd.to_datetime(df[date_col])
-    df = df.sort_values(['state', date_col])
+    df = df.sort_values(["state", date_col])
 
     logger.info(f"Loaded {len(df):,} records from {data_path}")
     return df
 
 
-def create_features(df: pd.DataFrame, target_col: str = 'covid') -> pd.DataFrame:
+def create_features(df: pd.DataFrame, target_col: str = "covid") -> pd.DataFrame:
     """
     Create features for prediction models.
 
@@ -62,41 +63,43 @@ def create_features(df: pd.DataFrame, target_col: str = 'covid') -> pd.DataFrame
     - Time features (week of year, month)
     """
     df = df.copy()
-    date_col = 'week_end_date' if 'week_end_date' in df.columns else 'week_sat'
+    date_col = "week_end_date" if "week_end_date" in df.columns else "week_sat"
 
     # Wastewater feature columns
-    ww_cols = ['percentile', 'percentile_weighted', 'ptc_15d']
+    ww_cols = ["percentile", "percentile_weighted", "ptc_15d"]
     ww_cols = [c for c in ww_cols if c in df.columns]
 
     # Create features per state
     feature_dfs = []
 
-    for state in df['state'].unique():
-        state_df = df[df['state'] == state].copy()
+    for state in df["state"].unique():
+        state_df = df[df["state"] == state].copy()
         state_df = state_df.sort_values(date_col)
 
         # Lagged wastewater features
         for col in ww_cols:
             for lag in [1, 2, 3, 4]:
-                state_df[f'{col}_lag{lag}'] = state_df[col].shift(lag)
+                state_df[f"{col}_lag{lag}"] = state_df[col].shift(lag)
 
         # Lagged target
         for lag in [1, 2, 3, 4]:
-            state_df[f'{target_col}_lag{lag}'] = state_df[target_col].shift(lag)
+            state_df[f"{target_col}_lag{lag}"] = state_df[target_col].shift(lag)
 
         # Rolling statistics on wastewater
-        if 'percentile' in ww_cols:
-            state_df['percentile_roll2_mean'] = state_df['percentile'].rolling(2).mean()
-            state_df['percentile_roll4_mean'] = state_df['percentile'].rolling(4).mean()
-            state_df['percentile_roll2_std'] = state_df['percentile'].rolling(2).std()
+        if "percentile" in ww_cols:
+            state_df["percentile_roll2_mean"] = state_df["percentile"].rolling(2).mean()
+            state_df["percentile_roll4_mean"] = state_df["percentile"].rolling(4).mean()
+            state_df["percentile_roll2_std"] = state_df["percentile"].rolling(2).std()
 
         # Rolling target statistics
-        state_df[f'{target_col}_roll2_mean'] = state_df[target_col].rolling(2).mean()
-        state_df[f'{target_col}_roll4_mean'] = state_df[target_col].rolling(4).mean()
+        state_df[f"{target_col}_roll2_mean"] = state_df[target_col].rolling(2).mean()
+        state_df[f"{target_col}_roll4_mean"] = state_df[target_col].rolling(4).mean()
 
         # Time features
-        state_df['week_of_year'] = pd.to_datetime(state_df[date_col]).dt.isocalendar().week.astype(int)
-        state_df['month'] = pd.to_datetime(state_df[date_col]).dt.month
+        state_df["week_of_year"] = (
+            pd.to_datetime(state_df[date_col]).dt.isocalendar().week.astype(int)
+        )
+        state_df["month"] = pd.to_datetime(state_df[date_col]).dt.month
 
         feature_dfs.append(state_df)
 
@@ -106,13 +109,12 @@ def create_features(df: pd.DataFrame, target_col: str = 'covid') -> pd.DataFrame
 
 
 def train_test_split_temporal(
-    df: pd.DataFrame,
-    test_weeks: int = 8
+    df: pd.DataFrame, test_weeks: int = 8
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
     Split data temporally - last N weeks for testing.
     """
-    date_col = 'week_end_date' if 'week_end_date' in df.columns else 'week_sat'
+    date_col = "week_end_date" if "week_end_date" in df.columns else "week_sat"
 
     unique_dates = sorted(df[date_col].unique())
     cutoff_date = unique_dates[-test_weeks]
@@ -126,11 +128,7 @@ def train_test_split_temporal(
     return train, test
 
 
-def evaluate_predictions(
-    y_true: np.ndarray,
-    y_pred: np.ndarray,
-    model_name: str
-) -> ModelResults:
+def evaluate_predictions(y_true: np.ndarray, y_pred: np.ndarray, model_name: str) -> ModelResults:
     """Calculate evaluation metrics."""
     # Remove NaN values
     mask = ~(np.isnan(y_true) | np.isnan(y_pred))
@@ -143,23 +141,22 @@ def evaluate_predictions(
     # MAPE (avoid division by zero)
     nonzero_mask = y_true != 0
     if nonzero_mask.sum() > 0:
-        mape = np.mean(np.abs((y_true[nonzero_mask] - y_pred[nonzero_mask]) / y_true[nonzero_mask])) * 100
+        mape = (
+            np.mean(np.abs((y_true[nonzero_mask] - y_pred[nonzero_mask]) / y_true[nonzero_mask]))
+            * 100
+        )
     else:
         mape = np.nan
 
     return ModelResults(
-        model_name=model_name,
-        mae=mae,
-        rmse=rmse,
-        mape=mape,
-        predictions=y_pred,
-        actuals=y_true
+        model_name=model_name, mae=mae, rmse=rmse, mape=mape, predictions=y_pred, actuals=y_true
     )
 
 
 # ============================================================================
 # BASELINE MODELS
 # ============================================================================
+
 
 def naive_baseline(train: pd.DataFrame, test: pd.DataFrame, target_col: str) -> ModelResults:
     """
@@ -168,9 +165,9 @@ def naive_baseline(train: pd.DataFrame, test: pd.DataFrame, target_col: str) -> 
     predictions = []
     actuals = []
 
-    for state in test['state'].unique():
-        state_train = train[train['state'] == state]
-        state_test = test[test['state'] == state]
+    for state in test["state"].unique():
+        state_train = train[train["state"] == state]
+        state_test = test[test["state"] == state]
 
         if len(state_train) == 0:
             continue
@@ -181,59 +178,49 @@ def naive_baseline(train: pd.DataFrame, test: pd.DataFrame, target_col: str) -> 
             predictions.append(last_value)
             actuals.append(row[target_col])
 
-    return evaluate_predictions(
-        np.array(actuals),
-        np.array(predictions),
-        "Naive (Last Value)"
-    )
+    return evaluate_predictions(np.array(actuals), np.array(predictions), "Naive (Last Value)")
 
 
 def seasonal_naive_baseline(
-    train: pd.DataFrame,
-    test: pd.DataFrame,
-    target_col: str,
-    season_length: int = 52
+    train: pd.DataFrame, test: pd.DataFrame, target_col: str, season_length: int = 52
 ) -> ModelResults:
     """
     Seasonal naive: predict value from same week last year.
     Falls back to naive if not enough history.
     """
-    date_col = 'week_end_date' if 'week_end_date' in train.columns else 'week_sat'
+    date_col = "week_end_date" if "week_end_date" in train.columns else "week_sat"
     predictions = []
     actuals = []
 
-    for state in test['state'].unique():
-        state_train = train[train['state'] == state].copy()
-        state_test = test[test['state'] == state].copy()
+    for state in test["state"].unique():
+        state_train = train[train["state"] == state].copy()
+        state_test = test[test["state"] == state].copy()
 
         if len(state_train) == 0:
             continue
 
-        state_train['week_of_year'] = pd.to_datetime(state_train[date_col]).dt.isocalendar().week.astype(int)
-        state_test['week_of_year'] = pd.to_datetime(state_test[date_col]).dt.isocalendar().week.astype(int)
+        state_train["week_of_year"] = (
+            pd.to_datetime(state_train[date_col]).dt.isocalendar().week.astype(int)
+        )
+        state_test["week_of_year"] = (
+            pd.to_datetime(state_test[date_col]).dt.isocalendar().week.astype(int)
+        )
 
         # Create lookup for seasonal values
-        seasonal_values = state_train.groupby('week_of_year')[target_col].mean().to_dict()
+        seasonal_values = state_train.groupby("week_of_year")[target_col].mean().to_dict()
         last_value = state_train[target_col].iloc[-1]
 
         for _, row in state_test.iterrows():
-            week = row['week_of_year']
+            week = row["week_of_year"]
             pred = seasonal_values.get(week, last_value)
             predictions.append(pred)
             actuals.append(row[target_col])
 
-    return evaluate_predictions(
-        np.array(actuals),
-        np.array(predictions),
-        "Seasonal Naive"
-    )
+    return evaluate_predictions(np.array(actuals), np.array(predictions), "Seasonal Naive")
 
 
 def arima_baseline(
-    train: pd.DataFrame,
-    test: pd.DataFrame,
-    target_col: str,
-    use_wastewater: bool = True
+    train: pd.DataFrame, test: pd.DataFrame, target_col: str, use_wastewater: bool = True
 ) -> ModelResults:
     """
     ARIMA model with optional wastewater covariates.
@@ -242,15 +229,15 @@ def arima_baseline(
     from statsmodels.tsa.arima.model import ARIMA
     from statsmodels.tsa.stattools import adfuller
 
-    date_col = 'week_end_date' if 'week_end_date' in train.columns else 'week_sat'
+    date_col = "week_end_date" if "week_end_date" in train.columns else "week_sat"
     predictions = []
     actuals = []
 
     model_name = "ARIMA + WW" if use_wastewater else "ARIMA"
 
-    for state in test['state'].unique():
-        state_train = train[train['state'] == state].sort_values(date_col)
-        state_test = test[test['state'] == state].sort_values(date_col)
+    for state in test["state"].unique():
+        state_train = train[train["state"] == state].sort_values(date_col)
+        state_test = test[test["state"] == state].sort_values(date_col)
 
         if len(state_train) < 10:
             continue
@@ -260,9 +247,9 @@ def arima_baseline(
         # Prepare exogenous variables if using wastewater
         exog_train = None
         exog_test = None
-        if use_wastewater and 'percentile' in state_train.columns:
-            exog_train = state_train[['percentile']].ffill().fillna(50).values
-            exog_test = state_test[['percentile']].ffill().fillna(50).values
+        if use_wastewater and "percentile" in state_train.columns:
+            exog_train = state_train[["percentile"]].ffill().fillna(50).values
+            exog_test = state_test[["percentile"]].ffill().fillna(50).values
 
         try:
             # Fit ARIMA(1,1,1) - simple but effective
@@ -290,18 +277,11 @@ def arima_baseline(
             predictions.extend([last_val] * len(state_test))
             actuals.extend(state_test[target_col].values)
 
-    return evaluate_predictions(
-        np.array(actuals),
-        np.array(predictions),
-        model_name
-    )
+    return evaluate_predictions(np.array(actuals), np.array(predictions), model_name)
 
 
 def xgboost_baseline(
-    train: pd.DataFrame,
-    test: pd.DataFrame,
-    target_col: str,
-    use_wastewater: bool = True
+    train: pd.DataFrame, test: pd.DataFrame, target_col: str, use_wastewater: bool = True
 ) -> tuple[ModelResults, any]:
     """
     XGBoost model with engineered features.
@@ -314,34 +294,34 @@ def xgboost_baseline(
 
     # Lagged target features
     for lag in [1, 2, 3, 4]:
-        col = f'{target_col}_lag{lag}'
+        col = f"{target_col}_lag{lag}"
         if col in train.columns:
             feature_cols.append(col)
 
     # Rolling features
-    for col in [f'{target_col}_roll2_mean', f'{target_col}_roll4_mean']:
+    for col in [f"{target_col}_roll2_mean", f"{target_col}_roll4_mean"]:
         if col in train.columns:
             feature_cols.append(col)
 
     # Wastewater features
     if use_wastewater:
-        ww_features = ['percentile', 'percentile_weighted', 'ptc_15d']
+        ww_features = ["percentile", "percentile_weighted", "ptc_15d"]
         for col in ww_features:
             if col in train.columns:
                 feature_cols.append(col)
             # Lagged versions
             for lag in [1, 2]:
-                lag_col = f'{col}_lag{lag}'
+                lag_col = f"{col}_lag{lag}"
                 if lag_col in train.columns:
                     feature_cols.append(lag_col)
 
         # Rolling wastewater
-        for col in ['percentile_roll2_mean', 'percentile_roll4_mean']:
+        for col in ["percentile_roll2_mean", "percentile_roll4_mean"]:
             if col in train.columns:
                 feature_cols.append(col)
 
     # Time features
-    for col in ['week_of_year', 'month']:
+    for col in ["week_of_year", "month"]:
         if col in train.columns:
             feature_cols.append(col)
 
@@ -366,7 +346,7 @@ def xgboost_baseline(
         subsample=0.8,
         colsample_bytree=0.8,
         random_state=42,
-        n_jobs=-1
+        n_jobs=-1,
     )
 
     model.fit(X_train, y_train, eval_set=[(X_test, y_test)], verbose=False)
@@ -378,10 +358,9 @@ def xgboost_baseline(
     results = evaluate_predictions(y_test, predictions, model_name)
 
     # Feature importance
-    importance = pd.DataFrame({
-        'feature': feature_cols,
-        'importance': model.feature_importances_
-    }).sort_values('importance', ascending=False)
+    importance = pd.DataFrame(
+        {"feature": feature_cols, "importance": model.feature_importances_}
+    ).sort_values("importance", ascending=False)
 
     logger.info(f"\nTop 10 Feature Importances:\n{importance.head(10)}")
 
@@ -389,9 +368,7 @@ def xgboost_baseline(
 
 
 def run_all_baselines(
-    data_path: Path,
-    target_col: str = 'covid',
-    test_weeks: int = 8
+    data_path: Path, target_col: str = "covid", test_weeks: int = 8
 ) -> pd.DataFrame:
     """
     Run all baseline models and compare results.
@@ -411,60 +388,68 @@ def run_all_baselines(
     # Run baselines
     results = []
 
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("RUNNING BASELINE MODELS")
-    print("="*70)
+    print("=" * 70)
 
     # 1. Naive baseline
     print("\n[1/5] Naive baseline...")
     naive_result = naive_baseline(train, test, target_col)
     results.append(naive_result)
-    print(f"      MAE: {naive_result.mae:.2f}, RMSE: {naive_result.rmse:.2f}, MAPE: {naive_result.mape:.1f}%")
+    print(
+        f"      MAE: {naive_result.mae:.2f}, RMSE: {naive_result.rmse:.2f}, MAPE: {naive_result.mape:.1f}%"
+    )
 
     # 2. Seasonal naive
     print("\n[2/5] Seasonal naive baseline...")
     seasonal_result = seasonal_naive_baseline(train, test, target_col)
     results.append(seasonal_result)
-    print(f"      MAE: {seasonal_result.mae:.2f}, RMSE: {seasonal_result.rmse:.2f}, MAPE: {seasonal_result.mape:.1f}%")
+    print(
+        f"      MAE: {seasonal_result.mae:.2f}, RMSE: {seasonal_result.rmse:.2f}, MAPE: {seasonal_result.mape:.1f}%"
+    )
 
     # 3. ARIMA without wastewater
     print("\n[3/5] ARIMA (no wastewater)...")
     arima_result = arima_baseline(train, test, target_col, use_wastewater=False)
     results.append(arima_result)
-    print(f"      MAE: {arima_result.mae:.2f}, RMSE: {arima_result.rmse:.2f}, MAPE: {arima_result.mape:.1f}%")
+    print(
+        f"      MAE: {arima_result.mae:.2f}, RMSE: {arima_result.rmse:.2f}, MAPE: {arima_result.mape:.1f}%"
+    )
 
     # 4. ARIMA with wastewater
     print("\n[4/5] ARIMA + wastewater covariates...")
     arima_ww_result = arima_baseline(train, test, target_col, use_wastewater=True)
     results.append(arima_ww_result)
-    print(f"      MAE: {arima_ww_result.mae:.2f}, RMSE: {arima_ww_result.rmse:.2f}, MAPE: {arima_ww_result.mape:.1f}%")
+    print(
+        f"      MAE: {arima_ww_result.mae:.2f}, RMSE: {arima_ww_result.rmse:.2f}, MAPE: {arima_ww_result.mape:.1f}%"
+    )
 
     # 5. XGBoost without wastewater
     print("\n[5/6] XGBoost (no wastewater)...")
     xgb_result, _, _ = xgboost_baseline(train, test, target_col, use_wastewater=False)
     results.append(xgb_result)
-    print(f"      MAE: {xgb_result.mae:.2f}, RMSE: {xgb_result.rmse:.2f}, MAPE: {xgb_result.mape:.1f}%")
+    print(
+        f"      MAE: {xgb_result.mae:.2f}, RMSE: {xgb_result.rmse:.2f}, MAPE: {xgb_result.mape:.1f}%"
+    )
 
     # 6. XGBoost with wastewater
     print("\n[6/6] XGBoost + wastewater features...")
-    xgb_ww_result, xgb_model, feature_importance = xgboost_baseline(train, test, target_col, use_wastewater=True)
+    xgb_ww_result, xgb_model, feature_importance = xgboost_baseline(
+        train, test, target_col, use_wastewater=True
+    )
     results.append(xgb_ww_result)
-    print(f"      MAE: {xgb_ww_result.mae:.2f}, RMSE: {xgb_ww_result.rmse:.2f}, MAPE: {xgb_ww_result.mape:.1f}%")
+    print(
+        f"      MAE: {xgb_ww_result.mae:.2f}, RMSE: {xgb_ww_result.rmse:.2f}, MAPE: {xgb_ww_result.mape:.1f}%"
+    )
 
     # Summary table
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("MODEL COMPARISON SUMMARY")
-    print("="*70)
+    print("=" * 70)
 
-    summary = pd.DataFrame([
-        {
-            'Model': r.model_name,
-            'MAE': r.mae,
-            'RMSE': r.rmse,
-            'MAPE (%)': r.mape
-        }
-        for r in results
-    ]).sort_values('MAE')
+    summary = pd.DataFrame(
+        [{"Model": r.model_name, "MAE": r.mae, "RMSE": r.rmse, "MAPE (%)": r.mape} for r in results]
+    ).sort_values("MAE")
 
     print(summary.to_string(index=False))
 
@@ -472,9 +457,9 @@ def run_all_baselines(
     arima_improvement = (arima_result.mae - arima_ww_result.mae) / arima_result.mae * 100
     xgb_improvement = (xgb_result.mae - xgb_ww_result.mae) / xgb_result.mae * 100
 
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("WASTEWATER SIGNAL VALUE")
-    print("="*70)
+    print("=" * 70)
     print(f"ARIMA MAE improvement with wastewater:   {arima_improvement:+.1f}%")
     print(f"XGBoost MAE improvement with wastewater: {xgb_improvement:+.1f}%")
 
@@ -491,9 +476,7 @@ if __name__ == "__main__":
         exit(1)
 
     summary, results, model, importance = run_all_baselines(
-        data_path,
-        target_col='covid',
-        test_weeks=8
+        data_path, target_col="covid", test_weeks=8
     )
 
     # Save results

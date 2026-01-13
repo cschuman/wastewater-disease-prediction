@@ -31,6 +31,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class Forecast:
     """Container for a single forecast."""
+
     target_date: datetime
     state: str
     target: str
@@ -64,10 +65,7 @@ class ForecastingPipeline:
         return featured
 
     def train_models(
-        self,
-        df: pd.DataFrame,
-        targets: list[str] | None = None,
-        n_splits: int = 5
+        self, df: pd.DataFrame, targets: list[str] | None = None, n_splits: int = 5
     ) -> dict:
         """
         Train models with time series cross-validation.
@@ -76,7 +74,7 @@ class ForecastingPipeline:
         """
         # Avoid mutable default argument
         if targets is None:
-            targets = ['covid_hosp', 'flu_hosp', 'rsv_hosp', 'respiratory_total']
+            targets = ["covid_hosp", "flu_hosp", "rsv_hosp", "respiratory_total"]
         results = {}
 
         for target in targets:
@@ -112,7 +110,7 @@ class ForecastingPipeline:
                     subsample=0.8,
                     colsample_bytree=0.8,
                     random_state=42,
-                    n_jobs=-1
+                    n_jobs=-1,
                 )
 
                 model.fit(X_train, y_train, eval_set=[(X_val, y_val)], verbose=False)
@@ -128,24 +126,23 @@ class ForecastingPipeline:
                 subsample=0.8,
                 colsample_bytree=0.8,
                 random_state=42,
-                n_jobs=-1
+                n_jobs=-1,
             )
             final_model.fit(X, y)
 
             self.models[target] = final_model
 
             # Feature importance
-            importance = pd.DataFrame({
-                'feature': feature_cols,
-                'importance': final_model.feature_importances_
-            }).sort_values('importance', ascending=False)
+            importance = pd.DataFrame(
+                {"feature": feature_cols, "importance": final_model.feature_importances_}
+            ).sort_values("importance", ascending=False)
 
             results[target] = {
-                'cv_mae_mean': np.mean(cv_scores),
-                'cv_mae_std': np.std(cv_scores),
-                'cv_scores': cv_scores,
-                'importance': importance,
-                'n_samples': len(X)
+                "cv_mae_mean": np.mean(cv_scores),
+                "cv_mae_std": np.std(cv_scores),
+                "cv_scores": cv_scores,
+                "importance": importance,
+                "n_samples": len(X),
             }
 
             logger.info(f"  CV MAE: {np.mean(cv_scores):.2f} (+/- {np.std(cv_scores):.2f})")
@@ -158,40 +155,41 @@ class ForecastingPipeline:
 
         # Target lags
         for lag in [1, 2, 3]:
-            col = f'{target}_lag{lag}'
+            col = f"{target}_lag{lag}"
             if col in df.columns:
                 feature_cols.append(col)
 
         # Target rolling
-        roll_col = f'{target}_roll2'
+        roll_col = f"{target}_roll2"
         if roll_col in df.columns:
             feature_cols.append(roll_col)
 
         # COVID wastewater features
-        covid_features = ['covid_ww_percentile', 'covid_ww_percentile_lag1',
-                          'covid_ww_percentile_lag2', 'covid_ww_ptc']
+        covid_features = [
+            "covid_ww_percentile",
+            "covid_ww_percentile_lag1",
+            "covid_ww_percentile_lag2",
+            "covid_ww_ptc",
+        ]
         for f in covid_features:
             if f in df.columns and df[f].notna().sum() > 100:
                 feature_cols.append(f)
 
         # Flu wastewater features
-        flu_features = ['flu_ww_conc', 'flu_ww_conc_lag1', 'flu_ww_flowpop']
+        flu_features = ["flu_ww_conc", "flu_ww_conc_lag1", "flu_ww_flowpop"]
         for f in flu_features:
             if f in df.columns and df[f].notna().sum() > 100:
                 feature_cols.append(f)
 
         # Time features
-        for f in ['week_of_year', 'month']:
+        for f in ["week_of_year", "month"]:
             if f in df.columns:
                 feature_cols.append(f)
 
         return feature_cols
 
     def generate_forecasts(
-        self,
-        df: pd.DataFrame,
-        horizon_weeks: int = 1,
-        targets: list[str] | None = None
+        self, df: pd.DataFrame, horizon_weeks: int = 1, targets: list[str] | None = None
     ) -> list[Forecast]:
         """
         Generate forecasts for specified horizon.
@@ -210,14 +208,18 @@ class ForecastingPipeline:
         """
         # Avoid mutable default argument
         if targets is None:
-            targets = ['respiratory_total']
+            targets = ["respiratory_total"]
 
         forecasts = []
         generated_at = datetime.now()
-        model_version = f"v{generated_at.strftime('%Y%m%d')}-hybrid" if horizon_weeks == 1 else f"v{generated_at.strftime('%Y%m%d')}"
+        model_version = (
+            f"v{generated_at.strftime('%Y%m%d')}-hybrid"
+            if horizon_weeks == 1
+            else f"v{generated_at.strftime('%Y%m%d')}"
+        )
 
         # Get the latest date in the data
-        latest_date = pd.to_datetime(df['week_end_date'].max())
+        latest_date = pd.to_datetime(df["week_end_date"].max())
         target_date = latest_date + timedelta(weeks=horizon_weeks)
 
         for target in targets:
@@ -229,8 +231,8 @@ class ForecastingPipeline:
             feature_cols = self.feature_cols[target]
 
             # For each state, generate forecast
-            for state in df['state'].unique():
-                state_df = df[df['state'] == state].sort_values('week_end_date')
+            for state in df["state"].unique():
+                state_df = df[df["state"] == state].sort_values("week_end_date")
 
                 if len(state_df) < 5:
                     continue
@@ -246,9 +248,7 @@ class ForecastingPipeline:
 
                 # For 1-week horizon, use hybrid approach with trend blending
                 if horizon_weeks == 1 and len(state_df) >= 3:
-                    point_estimate = self._hybrid_prediction(
-                        state_df, target, xgb_prediction
-                    )
+                    point_estimate = self._hybrid_prediction(state_df, target, xgb_prediction)
                 else:
                     point_estimate = xgb_prediction
 
@@ -265,17 +265,19 @@ class ForecastingPipeline:
                 lower_bound = max(0, point_estimate - 1.96 * residual_std)
                 upper_bound = point_estimate + 1.96 * residual_std
 
-                forecasts.append(Forecast(
-                    target_date=target_date,
-                    state=state,
-                    target=target,
-                    point_estimate=point_estimate,
-                    lower_bound=lower_bound,
-                    upper_bound=upper_bound,
-                    horizon_weeks=horizon_weeks,
-                    model_version=model_version,
-                    generated_at=generated_at
-                ))
+                forecasts.append(
+                    Forecast(
+                        target_date=target_date,
+                        state=state,
+                        target=target,
+                        point_estimate=point_estimate,
+                        lower_bound=lower_bound,
+                        upper_bound=upper_bound,
+                        horizon_weeks=horizon_weeks,
+                        model_version=model_version,
+                        generated_at=generated_at,
+                    )
+                )
 
         logger.info(f"Generated {len(forecasts)} forecasts for {target_date.date()}")
         return forecasts
@@ -294,10 +296,7 @@ class ForecastingPipeline:
         return (current - previous) / previous * 100
 
     def _hybrid_prediction(
-        self,
-        state_df: pd.DataFrame,
-        target: str,
-        xgb_prediction: float
+        self, state_df: pd.DataFrame, target: str, xgb_prediction: float
     ) -> float:
         """
         Generate hybrid prediction blending XGBoost with trend projection.
@@ -339,7 +338,7 @@ class ForecastingPipeline:
 
     def load_models(self):
         """Load trained models from disk."""
-        for target in ['covid_hosp', 'flu_hosp', 'rsv_hosp', 'respiratory_total']:
+        for target in ["covid_hosp", "flu_hosp", "rsv_hosp", "respiratory_total"]:
             path = self.model_dir / f"forecast_model_{target}.joblib"
             if path.exists():
                 self.models[target] = joblib.load(path)
@@ -352,20 +351,22 @@ class ForecastingPipeline:
 
 def forecasts_to_dataframe(forecasts: list[Forecast]) -> pd.DataFrame:
     """Convert list of forecasts to DataFrame."""
-    return pd.DataFrame([
-        {
-            'target_date': f.target_date,
-            'state': f.state,
-            'target': f.target,
-            'point_estimate': f.point_estimate,
-            'lower_bound': f.lower_bound,
-            'upper_bound': f.upper_bound,
-            'horizon_weeks': f.horizon_weeks,
-            'model_version': f.model_version,
-            'generated_at': f.generated_at
-        }
-        for f in forecasts
-    ])
+    return pd.DataFrame(
+        [
+            {
+                "target_date": f.target_date,
+                "state": f.state,
+                "target": f.target,
+                "point_estimate": f.point_estimate,
+                "lower_bound": f.lower_bound,
+                "upper_bound": f.upper_bound,
+                "horizon_weeks": f.horizon_weeks,
+                "model_version": f.model_version,
+                "generated_at": f.generated_at,
+            }
+            for f in forecasts
+        ]
+    )
 
 
 def run_forecast_pipeline(
@@ -373,7 +374,7 @@ def run_forecast_pipeline(
     model_dir: Path = Path("models"),
     output_dir: Path = Path("forecasts"),
     horizon_weeks: int = 1,
-    retrain: bool = True
+    retrain: bool = True,
 ) -> pd.DataFrame:
     """
     Run the complete forecasting pipeline.
@@ -394,9 +395,9 @@ def run_forecast_pipeline(
     pipeline = ForecastingPipeline(data_dir, model_dir)
 
     # Load data
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("FORECASTING PIPELINE")
-    print("="*70)
+    print("=" * 70)
 
     df = pipeline.load_latest_data()
 
@@ -405,9 +406,11 @@ def run_forecast_pipeline(
         cv_results = pipeline.train_models(df)
 
         print("\nCross-Validation Results:")
-        print("-"*50)
+        print("-" * 50)
         for target, result in cv_results.items():
-            print(f"{target:20s} MAE: {result['cv_mae_mean']:6.2f} (+/- {result['cv_mae_std']:.2f})")
+            print(
+                f"{target:20s} MAE: {result['cv_mae_mean']:6.2f} (+/- {result['cv_mae_std']:.2f})"
+            )
 
         pipeline.save_models()
     else:
@@ -417,9 +420,7 @@ def run_forecast_pipeline(
     all_forecasts = []
     for h in range(1, horizon_weeks + 1):
         forecasts = pipeline.generate_forecasts(
-            df,
-            horizon_weeks=h,
-            targets=['covid_hosp', 'flu_hosp', 'rsv_hosp', 'respiratory_total']
+            df, horizon_weeks=h, targets=["covid_hosp", "flu_hosp", "rsv_hosp", "respiratory_total"]
         )
         all_forecasts.extend(forecasts)
 
@@ -437,17 +438,19 @@ def run_forecast_pipeline(
     forecast_df.to_csv(latest_path, index=False)
 
     # Print summary
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("FORECAST SUMMARY")
-    print("="*70)
+    print("=" * 70)
 
-    for target in forecast_df['target'].unique():
-        target_df = forecast_df[forecast_df['target'] == target]
+    for target in forecast_df["target"].unique():
+        target_df = forecast_df[forecast_df["target"] == target]
         print(f"\n{target}:")
         print(f"  States: {target_df['state'].nunique()}")
         print(f"  Total forecast: {target_df['point_estimate'].sum():.0f}")
         print(f"  Mean per state: {target_df['point_estimate'].mean():.1f}")
-        print(f"  95% CI: [{target_df['lower_bound'].sum():.0f}, {target_df['upper_bound'].sum():.0f}]")
+        print(
+            f"  95% CI: [{target_df['lower_bound'].sum():.0f}, {target_df['upper_bound'].sum():.0f}]"
+        )
 
     return forecast_df
 
@@ -461,7 +464,4 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    run_forecast_pipeline(
-        horizon_weeks=args.horizon,
-        retrain=not args.no_retrain
-    )
+    run_forecast_pipeline(horizon_weeks=args.horizon, retrain=not args.no_retrain)

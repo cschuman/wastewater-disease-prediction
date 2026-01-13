@@ -15,168 +15,156 @@ from src.analysis.health_equity_ratios import (
     load_and_merge_state_data,
     calculate_hosp_ww_ratios,
     get_state_svi_rankings,
-    analyze_equity_patterns
+    analyze_equity_patterns,
 )
 
 
 def create_equity_dashboard(results: dict, output_dir: Path = Path("dashboards")):
     """Create comprehensive equity analysis dashboard."""
 
-    data = results['data']
+    data = results["data"]
     output_dir.mkdir(parents=True, exist_ok=True)
 
     # Create figure with subplots
     fig = make_subplots(
-        rows=2, cols=2,
+        rows=2,
+        cols=2,
         subplot_titles=(
-            'WW-Hospitalization R² vs State SVI Score',
-            'Signal Reliability (Ratio CV) vs SVI Score',
-            'R² by SVI Quartile',
-            'Signal Reliability by SVI Quartile'
+            "WW-Hospitalization R² vs State SVI Score",
+            "Signal Reliability (Ratio CV) vs SVI Score",
+            "R² by SVI Quartile",
+            "Signal Reliability by SVI Quartile",
         ),
         vertical_spacing=0.12,
-        horizontal_spacing=0.1
+        horizontal_spacing=0.1,
     )
 
     # Color by SVI quartile
-    colors = {
-        'Q1 (Low)': '#2ecc71',
-        'Q2': '#3498db',
-        'Q3': '#f39c12',
-        'Q4 (High)': '#e74c3c'
-    }
-    data['color'] = data['svi_quartile'].map(colors)
+    colors = {"Q1 (Low)": "#2ecc71", "Q2": "#3498db", "Q3": "#f39c12", "Q4 (High)": "#e74c3c"}
+    data["color"] = data["svi_quartile"].map(colors)
 
     # Plot 1: R² vs SVI Score (scatter)
     fig.add_trace(
         go.Scatter(
-            x=data['svi_score'].tolist(),
-            y=data['hosp_ww_r2'].tolist(),
-            mode='markers+text',
-            text=data['state'].tolist(),
-            textposition='top center',
+            x=data["svi_score"].tolist(),
+            y=data["hosp_ww_r2"].tolist(),
+            mode="markers+text",
+            text=data["state"].tolist(),
+            textposition="top center",
             textfont=dict(size=8),
-            marker=dict(
-                size=12,
-                color=data['color'].tolist(),
-                line=dict(width=1, color='white')
-            ),
-            name='States',
-            hovertemplate='%{text}<br>SVI: %{x:.2f}<br>R²: %{y:.3f}<extra></extra>'
+            marker=dict(size=12, color=data["color"].tolist(), line=dict(width=1, color="white")),
+            name="States",
+            hovertemplate="%{text}<br>SVI: %{x:.2f}<br>R²: %{y:.3f}<extra></extra>",
         ),
-        row=1, col=1
+        row=1,
+        col=1,
     )
 
     # Add trendline
-    z = np.polyfit(data['svi_score'], data['hosp_ww_r2'], 1)
+    z = np.polyfit(data["svi_score"], data["hosp_ww_r2"], 1)
     p = np.poly1d(z)
-    x_line = np.linspace(data['svi_score'].min(), data['svi_score'].max(), 100)
+    x_line = np.linspace(data["svi_score"].min(), data["svi_score"].max(), 100)
     fig.add_trace(
         go.Scatter(
             x=x_line.tolist(),
             y=p(x_line).tolist(),
-            mode='lines',
-            line=dict(color='red', dash='dash', width=2),
-            name='Trend',
-            showlegend=False
+            mode="lines",
+            line=dict(color="red", dash="dash", width=2),
+            name="Trend",
+            showlegend=False,
         ),
-        row=1, col=1
+        row=1,
+        col=1,
     )
 
     # Plot 2: Ratio CV vs SVI Score (scatter)
     fig.add_trace(
         go.Scatter(
-            x=data['svi_score'].tolist(),
-            y=data['hosp_ww_ratio_cv'].tolist(),
-            mode='markers+text',
-            text=data['state'].tolist(),
-            textposition='top center',
+            x=data["svi_score"].tolist(),
+            y=data["hosp_ww_ratio_cv"].tolist(),
+            mode="markers+text",
+            text=data["state"].tolist(),
+            textposition="top center",
             textfont=dict(size=8),
-            marker=dict(
-                size=12,
-                color=data['color'].tolist(),
-                line=dict(width=1, color='white')
-            ),
-            name='States',
+            marker=dict(size=12, color=data["color"].tolist(), line=dict(width=1, color="white")),
+            name="States",
             showlegend=False,
-            hovertemplate='%{text}<br>SVI: %{x:.2f}<br>CV: %{y:.3f}<extra></extra>'
+            hovertemplate="%{text}<br>SVI: %{x:.2f}<br>CV: %{y:.3f}<extra></extra>",
         ),
-        row=1, col=2
+        row=1,
+        col=2,
     )
 
     # Add trendline
-    z2 = np.polyfit(data['svi_score'], data['hosp_ww_ratio_cv'], 1)
+    z2 = np.polyfit(data["svi_score"], data["hosp_ww_ratio_cv"], 1)
     p2 = np.poly1d(z2)
     fig.add_trace(
         go.Scatter(
             x=x_line.tolist(),
             y=p2(x_line).tolist(),
-            mode='lines',
-            line=dict(color='red', dash='dash', width=2),
-            name='Trend',
-            showlegend=False
+            mode="lines",
+            line=dict(color="red", dash="dash", width=2),
+            name="Trend",
+            showlegend=False,
         ),
-        row=1, col=2
+        row=1,
+        col=2,
     )
 
     # Plot 3: R² by quartile (box plot)
-    for quartile in ['Q1 (Low)', 'Q2', 'Q3', 'Q4 (High)']:
-        quartile_data = data[data['svi_quartile'] == quartile]['hosp_ww_r2']
+    for quartile in ["Q1 (Low)", "Q2", "Q3", "Q4 (High)"]:
+        quartile_data = data[data["svi_quartile"] == quartile]["hosp_ww_r2"]
         fig.add_trace(
             go.Box(
                 y=quartile_data.tolist(),
                 name=quartile,
                 marker_color=colors[quartile],
-                showlegend=False
+                showlegend=False,
             ),
-            row=2, col=1
+            row=2,
+            col=1,
         )
 
     # Plot 4: Ratio CV by quartile (box plot)
-    for quartile in ['Q1 (Low)', 'Q2', 'Q3', 'Q4 (High)']:
-        quartile_data = data[data['svi_quartile'] == quartile]['hosp_ww_ratio_cv']
+    for quartile in ["Q1 (Low)", "Q2", "Q3", "Q4 (High)"]:
+        quartile_data = data[data["svi_quartile"] == quartile]["hosp_ww_ratio_cv"]
         fig.add_trace(
             go.Box(
                 y=quartile_data.tolist(),
                 name=quartile,
                 marker_color=colors[quartile],
-                showlegend=False
+                showlegend=False,
             ),
-            row=2, col=2
+            row=2,
+            col=2,
         )
 
     # Update layout
     fig.update_layout(
         title=dict(
-            text='Health Equity Analysis: Wastewater Surveillance Signal Quality by State Vulnerability',
-            font=dict(size=16)
+            text="Health Equity Analysis: Wastewater Surveillance Signal Quality by State Vulnerability",
+            font=dict(size=16),
         ),
         height=800,
         showlegend=True,
-        legend=dict(
-            orientation='h',
-            yanchor='bottom',
-            y=1.02,
-            xanchor='right',
-            x=1
-        )
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
     )
 
     # Update axes labels
-    fig.update_xaxes(title_text='State SVI Score (higher = more vulnerable)', row=1, col=1)
-    fig.update_yaxes(title_text='WW-Hospitalization R²', row=1, col=1)
-    fig.update_xaxes(title_text='State SVI Score', row=1, col=2)
-    fig.update_yaxes(title_text='Ratio Variability (CV)', row=1, col=2)
-    fig.update_xaxes(title_text='SVI Quartile', row=2, col=1)
-    fig.update_yaxes(title_text='WW-Hospitalization R²', row=2, col=1)
-    fig.update_xaxes(title_text='SVI Quartile', row=2, col=2)
-    fig.update_yaxes(title_text='Ratio Variability (CV)', row=2, col=2)
+    fig.update_xaxes(title_text="State SVI Score (higher = more vulnerable)", row=1, col=1)
+    fig.update_yaxes(title_text="WW-Hospitalization R²", row=1, col=1)
+    fig.update_xaxes(title_text="State SVI Score", row=1, col=2)
+    fig.update_yaxes(title_text="Ratio Variability (CV)", row=1, col=2)
+    fig.update_xaxes(title_text="SVI Quartile", row=2, col=1)
+    fig.update_yaxes(title_text="WW-Hospitalization R²", row=2, col=1)
+    fig.update_xaxes(title_text="SVI Quartile", row=2, col=2)
+    fig.update_yaxes(title_text="Ratio Variability (CV)", row=2, col=2)
 
     # Save as HTML with explanations
-    output_path = output_dir / 'health_equity_analysis.html'
+    output_path = output_dir / "health_equity_analysis.html"
 
     # Create HTML with ELI5 explanations
-    html_content = f'''<!DOCTYPE html>
+    html_content = f"""<!DOCTYPE html>
 <html>
 <head>
     <title>Health Equity Analysis: Wastewater Surveillance</title>
@@ -336,9 +324,9 @@ def create_equity_dashboard(results: dict, output_dir: Path = Path("dashboards")
     </div>
 
 </body>
-</html>'''
+</html>"""
 
-    with open(output_path, 'w') as f:
+    with open(output_path, "w") as f:
         f.write(html_content)
 
     print(f"Saved equity dashboard to {output_path}")
@@ -356,57 +344,96 @@ def investigate_coverage_gap(data_dir: Path = Path("data")) -> pd.DataFrame:
     import pandas as pd
 
     # Load raw NWSS data
-    nwss = pd.read_parquet(data_dir / 'raw' / 'nwss' / 'nwss_metrics_20260111.parquet')
+    nwss = pd.read_parquet(data_dir / "raw" / "nwss" / "nwss_metrics_20260111.parquet")
 
     # Get unique sites per state
     from src.analysis.health_equity_ratios import get_state_name_to_abbrev
-    state_map = get_state_name_to_abbrev()
-    nwss['state'] = nwss['wwtp_jurisdiction'].map(state_map)
 
-    coverage = nwss.groupby('state').agg({
-        'wwtp_id': 'nunique',
-        'population_served': 'sum'
-    }).reset_index()
-    coverage.columns = ['state', 'n_sites', 'pop_covered']
+    state_map = get_state_name_to_abbrev()
+    nwss["state"] = nwss["wwtp_jurisdiction"].map(state_map)
+
+    coverage = (
+        nwss.groupby("state").agg({"wwtp_id": "nunique", "population_served": "sum"}).reset_index()
+    )
+    coverage.columns = ["state", "n_sites", "pop_covered"]
 
     # Get state populations (approximate from Census)
     state_pops = {
-        'CA': 39500000, 'TX': 29500000, 'FL': 22000000, 'NY': 19500000,
-        'PA': 13000000, 'IL': 12800000, 'OH': 11800000, 'GA': 10700000,
-        'NC': 10500000, 'MI': 10000000, 'NJ': 9300000, 'VA': 8600000,
-        'WA': 7700000, 'AZ': 7300000, 'MA': 7000000, 'TN': 6900000,
-        'IN': 6800000, 'MO': 6200000, 'MD': 6200000, 'WI': 5900000,
-        'CO': 5800000, 'MN': 5700000, 'SC': 5200000, 'AL': 5000000,
-        'LA': 4700000, 'KY': 4500000, 'OR': 4200000, 'OK': 4000000,
-        'CT': 3600000, 'UT': 3300000, 'IA': 3200000, 'NV': 3100000,
-        'AR': 3000000, 'MS': 3000000, 'KS': 2900000, 'NM': 2100000,
-        'NE': 1960000, 'ID': 1900000, 'WV': 1800000, 'HI': 1450000,
-        'NH': 1400000, 'ME': 1360000, 'MT': 1100000, 'RI': 1100000,
-        'DE': 990000, 'SD': 890000, 'ND': 770000, 'AK': 730000,
-        'DC': 700000, 'VT': 650000, 'WY': 580000
+        "CA": 39500000,
+        "TX": 29500000,
+        "FL": 22000000,
+        "NY": 19500000,
+        "PA": 13000000,
+        "IL": 12800000,
+        "OH": 11800000,
+        "GA": 10700000,
+        "NC": 10500000,
+        "MI": 10000000,
+        "NJ": 9300000,
+        "VA": 8600000,
+        "WA": 7700000,
+        "AZ": 7300000,
+        "MA": 7000000,
+        "TN": 6900000,
+        "IN": 6800000,
+        "MO": 6200000,
+        "MD": 6200000,
+        "WI": 5900000,
+        "CO": 5800000,
+        "MN": 5700000,
+        "SC": 5200000,
+        "AL": 5000000,
+        "LA": 4700000,
+        "KY": 4500000,
+        "OR": 4200000,
+        "OK": 4000000,
+        "CT": 3600000,
+        "UT": 3300000,
+        "IA": 3200000,
+        "NV": 3100000,
+        "AR": 3000000,
+        "MS": 3000000,
+        "KS": 2900000,
+        "NM": 2100000,
+        "NE": 1960000,
+        "ID": 1900000,
+        "WV": 1800000,
+        "HI": 1450000,
+        "NH": 1400000,
+        "ME": 1360000,
+        "MT": 1100000,
+        "RI": 1100000,
+        "DE": 990000,
+        "SD": 890000,
+        "ND": 770000,
+        "AK": 730000,
+        "DC": 700000,
+        "VT": 650000,
+        "WY": 580000,
     }
 
-    coverage['state_pop'] = coverage['state'].map(state_pops)
-    coverage['pct_covered'] = coverage['pop_covered'] / coverage['state_pop'] * 100
-    coverage['sites_per_million'] = coverage['n_sites'] / (coverage['state_pop'] / 1e6)
+    coverage["state_pop"] = coverage["state"].map(state_pops)
+    coverage["pct_covered"] = coverage["pop_covered"] / coverage["state_pop"] * 100
+    coverage["sites_per_million"] = coverage["n_sites"] / (coverage["state_pop"] / 1e6)
 
     # Merge with SVI
     svi = get_state_svi_rankings()
-    coverage = pd.merge(coverage, svi, on='state', how='inner')
+    coverage = pd.merge(coverage, svi, on="state", how="inner")
 
     # Correlate coverage with SVI
     from scipy import stats
-    corr_sites, p_sites = stats.pearsonr(coverage['svi_score'], coverage['sites_per_million'])
-    corr_pct, p_pct = stats.pearsonr(coverage['svi_score'], coverage['pct_covered'])
+
+    corr_sites, p_sites = stats.pearsonr(coverage["svi_score"], coverage["sites_per_million"])
+    corr_pct, p_pct = stats.pearsonr(coverage["svi_score"], coverage["pct_covered"])
 
     print("\n--- WW Coverage vs SVI ---")
     print(f"Sites per million vs SVI: r={corr_sites:.3f}, p={p_sites:.4f}")
     print(f"Population % covered vs SVI: r={corr_pct:.3f}, p={p_pct:.4f}")
 
     # Show high vs low SVI comparison
-    coverage['svi_group'] = pd.qcut(coverage['svi_score'], 2, labels=['Low SVI', 'High SVI'])
+    coverage["svi_group"] = pd.qcut(coverage["svi_score"], 2, labels=["Low SVI", "High SVI"])
     print("\nCoverage by SVI group:")
-    print(coverage.groupby('svi_group')[['sites_per_million', 'pct_covered']].mean().round(2))
+    print(coverage.groupby("svi_group")[["sites_per_million", "pct_covered"]].mean().round(2))
 
     return coverage
 

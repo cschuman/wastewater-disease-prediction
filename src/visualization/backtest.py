@@ -23,7 +23,7 @@ def run_backtest(
     target: str = "respiratory_total",
     test_weeks: int = 20,
     horizon: int = 1,
-    output_dir: Path = Path("dashboards")
+    output_dir: Path = Path("dashboards"),
 ) -> go.Figure:
     """
     Run walk-forward backtesting.
@@ -40,29 +40,41 @@ def run_backtest(
     df = create_multi_pathogen_features(merged)
 
     # Aggregate to national level for cleaner visualization
-    national = df.groupby('week_end_date').agg({
-        'covid_hosp': 'sum',
-        'flu_hosp': 'sum',
-        'rsv_hosp': 'sum',
-        'respiratory_total': 'sum',
-        'covid_ww_percentile': 'mean',
-        'flu_ww_conc': 'mean',
-    }).reset_index()
+    national = (
+        df.groupby("week_end_date")
+        .agg(
+            {
+                "covid_hosp": "sum",
+                "flu_hosp": "sum",
+                "rsv_hosp": "sum",
+                "respiratory_total": "sum",
+                "covid_ww_percentile": "mean",
+                "flu_ww_conc": "mean",
+            }
+        )
+        .reset_index()
+    )
 
-    national['week_end_date'] = pd.to_datetime(national['week_end_date'])
-    national = national.sort_values('week_end_date').reset_index(drop=True)
+    national["week_end_date"] = pd.to_datetime(national["week_end_date"])
+    national = national.sort_values("week_end_date").reset_index(drop=True)
 
     # Create lag features for national data
     for lag in [1, 2, 3]:
-        national[f'{target}_lag{lag}'] = national[target].shift(lag)
-    national[f'{target}_roll2'] = national[target].rolling(2).mean()
-    national['week_of_year'] = national['week_end_date'].dt.isocalendar().week.astype(int)
-    national['month'] = national['week_end_date'].dt.month
+        national[f"{target}_lag{lag}"] = national[target].shift(lag)
+    national[f"{target}_roll2"] = national[target].rolling(2).mean()
+    national["week_of_year"] = national["week_end_date"].dt.isocalendar().week.astype(int)
+    national["month"] = national["week_end_date"].dt.month
 
     # Define features
-    feature_cols = [f'{target}_lag1', f'{target}_lag2', f'{target}_lag3',
-                    f'{target}_roll2', 'week_of_year', 'month',
-                    'covid_ww_percentile']
+    feature_cols = [
+        f"{target}_lag1",
+        f"{target}_lag2",
+        f"{target}_lag3",
+        f"{target}_roll2",
+        "week_of_year",
+        "month",
+        "covid_ww_percentile",
+    ]
 
     # Drop rows with NaN features
     national = national.dropna(subset=feature_cols + [target]).reset_index(drop=True)
@@ -72,7 +84,9 @@ def run_backtest(
     test_start_idx = n_total - test_weeks
 
     logger.info(f"Total weeks: {n_total}, Test weeks: {test_weeks}")
-    logger.info(f"Test period: {national.iloc[test_start_idx]['week_end_date']} to {national.iloc[-1]['week_end_date']}")
+    logger.info(
+        f"Test period: {national.iloc[test_start_idx]['week_end_date']} to {national.iloc[-1]['week_end_date']}"
+    )
 
     # Walk-forward backtesting
     results = []
@@ -86,11 +100,7 @@ def run_backtest(
 
         # Train model
         model = xgb.XGBRegressor(
-            n_estimators=100,
-            max_depth=5,
-            learning_rate=0.1,
-            random_state=42,
-            n_jobs=-1
+            n_estimators=100, max_depth=5, learning_rate=0.1, random_state=42, n_jobs=-1
         )
         model.fit(X_train, y_train, verbose=False)
 
@@ -100,56 +110,60 @@ def run_backtest(
             if pred_idx >= n_total:
                 break
 
-            X_pred = national.iloc[pred_idx:pred_idx+1][feature_cols].values
+            X_pred = national.iloc[pred_idx : pred_idx + 1][feature_cols].values
             prediction = model.predict(X_pred)[0]
             actual = national.iloc[pred_idx][target]
-            pred_date = national.iloc[pred_idx]['week_end_date']
+            pred_date = national.iloc[pred_idx]["week_end_date"]
 
-            results.append({
-                'date': pred_date,
-                'actual': actual,
-                'predicted': prediction,
-                'horizon': h + 1,
-                'train_size': len(train_df)
-            })
+            results.append(
+                {
+                    "date": pred_date,
+                    "actual": actual,
+                    "predicted": prediction,
+                    "horizon": h + 1,
+                    "train_size": len(train_df),
+                }
+            )
 
     results_df = pd.DataFrame(results)
 
     # Calculate metrics
-    mae = np.mean(np.abs(results_df['actual'] - results_df['predicted']))
-    mape = np.mean(np.abs((results_df['actual'] - results_df['predicted']) / results_df['actual'])) * 100
+    mae = np.mean(np.abs(results_df["actual"] - results_df["predicted"]))
+    mape = (
+        np.mean(np.abs((results_df["actual"] - results_df["predicted"]) / results_df["actual"]))
+        * 100
+    )
 
     logger.info(f"Backtest MAE: {mae:.0f}")
     logger.info(f"Backtest MAPE: {mape:.1f}%")
 
     # Create visualization
     fig = make_subplots(
-        rows=2, cols=1,
+        rows=2,
+        cols=1,
         shared_xaxes=True,
         vertical_spacing=0.1,
         subplot_titles=(
             f'Backtest: {target.replace("_", " ").title()} - Actual vs Predicted',
-            'Prediction Error Over Time'
+            "Prediction Error Over Time",
         ),
-        row_heights=[0.7, 0.3]
+        row_heights=[0.7, 0.3],
     )
 
     # Convert to lists for Plotly
-    dates = results_df['date'].dt.strftime('%Y-%m-%d').tolist()
-    actuals = results_df['actual'].tolist()
-    predictions = results_df['predicted'].tolist()
-    errors = (results_df['predicted'] - results_df['actual']).tolist()
-    pct_errors = ((results_df['predicted'] - results_df['actual']) / results_df['actual'] * 100).tolist()
+    dates = results_df["date"].dt.strftime("%Y-%m-%d").tolist()
+    actuals = results_df["actual"].tolist()
+    predictions = results_df["predicted"].tolist()
+    errors = (results_df["predicted"] - results_df["actual"]).tolist()
+    pct_errors = (
+        (results_df["predicted"] - results_df["actual"]) / results_df["actual"] * 100
+    ).tolist()
 
     # Actual values
     fig.add_trace(
-        go.Scatter(
-            x=dates,
-            y=actuals,
-            name='Actual',
-            line=dict(color='#1d3557', width=3)
-        ),
-        row=1, col=1
+        go.Scatter(x=dates, y=actuals, name="Actual", line=dict(color="#1d3557", width=3)),
+        row=1,
+        col=1,
     )
 
     # Predicted values
@@ -157,10 +171,11 @@ def run_backtest(
         go.Scatter(
             x=dates,
             y=predictions,
-            name='Predicted',
-            line=dict(color='#e63946', width=2, dash='dash')
+            name="Predicted",
+            line=dict(color="#e63946", width=2, dash="dash"),
         ),
-        row=1, col=1
+        row=1,
+        col=1,
     )
 
     # Error bars
@@ -168,20 +183,21 @@ def run_backtest(
         go.Bar(
             x=dates,
             y=pct_errors,
-            name='% Error',
-            marker_color=['#2a9d8f' if e >= 0 else '#e63946' for e in pct_errors]
+            name="% Error",
+            marker_color=["#2a9d8f" if e >= 0 else "#e63946" for e in pct_errors],
         ),
-        row=2, col=1
+        row=2,
+        col=1,
     )
 
     # Add zero line
     fig.add_hline(y=0, line_dash="dash", line_color="gray", row=2, col=1)
 
     fig.update_layout(
-        title=f'Model Backtest Results (MAE: {mae:.0f}, MAPE: {mape:.1f}%)',
+        title=f"Model Backtest Results (MAE: {mae:.0f}, MAPE: {mape:.1f}%)",
         height=700,
         showlegend=True,
-        hovermode='x unified'
+        hovermode="x unified",
     )
 
     fig.update_yaxes(title_text="Hospitalizations", row=1, col=1)
@@ -197,9 +213,9 @@ def run_backtest(
     logger.info(f"Saved backtest visualization to {output_path}")
 
     # Also create a summary table
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("BACKTEST RESULTS")
-    print("="*60)
+    print("=" * 60)
     print(f"Target: {target}")
     print(f"Test period: {test_weeks} weeks")
     print(f"Forecast horizon: {horizon} week(s)")
@@ -223,4 +239,5 @@ if __name__ == "__main__":
     fig = run_backtest()
 
     import subprocess
+
     subprocess.run(["open", "dashboards/backtest_results.html"])

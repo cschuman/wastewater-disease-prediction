@@ -25,7 +25,7 @@ class TestDateValidation:
         invalid_dates = [
             "01-01-2024",  # Wrong order
             "2024/01/01",  # Wrong separator
-            "2024-1-1",    # Missing leading zeros
+            "2024-1-1",  # Missing leading zeros
             "not-a-date",
             "2024-13-01",  # Invalid month
             "2024-01-32",  # Invalid day

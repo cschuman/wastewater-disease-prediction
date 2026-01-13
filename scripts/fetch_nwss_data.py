@@ -21,13 +21,11 @@ import pandas as pd
 from sodapy import Socrata
 
 # Allowed domains for SSRF prevention
-ALLOWED_DOMAINS = ['data.cdc.gov', 'healthdata.gov']
+ALLOWED_DOMAINS = ["data.cdc.gov", "healthdata.gov"]
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
+
 
 def validate_date(date_str: str) -> str:
     """
@@ -42,12 +40,12 @@ def validate_date(date_str: str) -> str:
     Raises:
         ValueError: If date format is invalid
     """
-    if not re.match(r'^\d{4}-\d{2}-\d{2}$', date_str):
+    if not re.match(r"^\d{4}-\d{2}-\d{2}$", date_str):
         raise ValueError(f"Invalid date format: {date_str}. Expected YYYY-MM-DD")
 
     # Parse to ensure it's a real date
     try:
-        datetime.strptime(date_str, '%Y-%m-%d')
+        datetime.strptime(date_str, "%Y-%m-%d")
     except ValueError:
         raise ValueError(f"Invalid date: {date_str}")
 
@@ -75,9 +73,7 @@ def validate_output_path(output_dir: str | Path, project_root: Path) -> Path:
     try:
         output_path.relative_to(project_root)
     except ValueError:
-        raise ValueError(
-            f"Output directory {output_path} is outside project root {project_root}"
-        )
+        raise ValueError(f"Output directory {output_path} is outside project root {project_root}")
 
     return output_path
 
@@ -104,13 +100,13 @@ DATASETS = {
     "metrics": {
         "id": "2ew6-ywp6",
         "name": "NWSS Public SARS-CoV-2 Wastewater Metric Data",
-        "description": "Percentiles and percent changes for wastewater viral activity"
+        "description": "Percentiles and percent changes for wastewater viral activity",
     },
     "concentration": {
         "id": "g653-rqe2",
         "name": "NWSS Public SARS-CoV-2 Concentration Data",
-        "description": "Raw concentration values with normalization factors"
-    }
+        "description": "Raw concentration values with normalization factors",
+    },
 }
 
 
@@ -118,7 +114,7 @@ def fetch_nwss_data(
     dataset_key: str = "metrics",
     start_date: str | None = None,
     limit: int = 500000,
-    output_dir: Path | None = None
+    output_dir: Path | None = None,
 ) -> pd.DataFrame:
     """
     Fetch NWSS data from CDC Socrata API.
@@ -152,12 +148,7 @@ def fetch_nwss_data(
 
         # Fetch data
         logger.info(f"Fetching up to {limit:,} records...")
-        results = client.get(
-            dataset["id"],
-            limit=limit,
-            where=where_clause,
-            order="date_end DESC"
-        )
+        results = client.get(dataset["id"], limit=limit, where=where_clause, order="date_end DESC")
 
         df = pd.DataFrame.from_records(results)
         logger.info(f"Fetched {len(df):,} records")
@@ -197,8 +188,7 @@ def fetch_nwss_data(
 
 
 def fetch_all_pathogens(
-    start_date: str | None = None,
-    output_dir: Path | None = None
+    start_date: str | None = None, output_dir: Path | None = None
 ) -> dict[str, pd.DataFrame]:
     """
     Fetch wastewater data for all available pathogens.
@@ -259,32 +249,22 @@ def print_data_summary(df: pd.DataFrame) -> None:
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Fetch CDC NWSS wastewater surveillance data"
-    )
+    parser = argparse.ArgumentParser(description="Fetch CDC NWSS wastewater surveillance data")
     parser.add_argument(
         "--dataset",
         choices=["metrics", "concentration", "all"],
         default="metrics",
-        help="Which dataset to fetch"
+        help="Which dataset to fetch",
     )
     parser.add_argument(
-        "--start-date",
-        type=str,
-        default="2023-01-01",
-        help="Start date for data (YYYY-MM-DD)"
+        "--start-date", type=str, default="2023-01-01", help="Start date for data (YYYY-MM-DD)"
     )
-    parser.add_argument(
-        "--output",
-        type=str,
-        default="data/raw/nwss",
-        help="Output directory"
-    )
+    parser.add_argument("--output", type=str, default="data/raw/nwss", help="Output directory")
     parser.add_argument(
         "--limit",
         type=validate_limit,
         default=500000,
-        help="Maximum records to fetch (1-10,000,000)"
+        help="Maximum records to fetch (1-10,000,000)",
     )
 
     args = parser.parse_args()
@@ -303,10 +283,7 @@ def main():
         # Fetch all datasets
         for key in DATASETS:
             df = fetch_nwss_data(
-                dataset_key=key,
-                start_date=args.start_date,
-                limit=args.limit,
-                output_dir=output_dir
+                dataset_key=key, start_date=args.start_date, limit=args.limit, output_dir=output_dir
             )
             print_data_summary(df)
     else:
@@ -314,7 +291,7 @@ def main():
             dataset_key=args.dataset,
             start_date=args.start_date,
             limit=args.limit,
-            output_dir=output_dir
+            output_dir=output_dir,
         )
         print_data_summary(df)
 

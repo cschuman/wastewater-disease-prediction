@@ -22,9 +22,7 @@ FLU_DATASET_ID = "ymmh-divb"
 
 
 def fetch_flu_wastewater(
-    start_date: str = "2024-01-01",
-    limit: int = 500000,
-    output_dir: Path | None = None
+    start_date: str = "2024-01-01", limit: int = 500000, output_dir: Path | None = None
 ) -> pd.DataFrame:
     """
     Fetch Influenza A wastewater data from CDC.
@@ -45,23 +43,25 @@ def fetch_flu_wastewater(
     logger.info(f"Filter: {where_clause}")
 
     results = client.get(
-        FLU_DATASET_ID,
-        limit=limit,
-        where=where_clause,
-        order="sample_collect_date DESC"
+        FLU_DATASET_ID, limit=limit, where=where_clause, order="sample_collect_date DESC"
     )
 
     df = pd.DataFrame.from_records(results)
     logger.info(f"Fetched {len(df):,} records")
 
     # Convert types
-    df['sample_collect_date'] = pd.to_datetime(df['sample_collect_date'])
+    df["sample_collect_date"] = pd.to_datetime(df["sample_collect_date"])
 
-    numeric_cols = ['population_served', 'pcr_target_avg_conc', 'pcr_target_avg_conc_lin',
-                    'pcr_target_flowpop_lin', 'flow_rate']
+    numeric_cols = [
+        "population_served",
+        "pcr_target_avg_conc",
+        "pcr_target_avg_conc_lin",
+        "pcr_target_flowpop_lin",
+        "flow_rate",
+    ]
     for col in numeric_cols:
         if col in df.columns:
-            df[col] = pd.to_numeric(df[col], errors='coerce')
+            df[col] = pd.to_numeric(df[col], errors="coerce")
 
     # Save if output specified
     if output_dir:
@@ -87,23 +87,31 @@ def aggregate_to_state_week(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
 
     # Create week ending date (Saturday)
-    df['week_end'] = df['sample_collect_date'].dt.to_period('W-SAT').dt.end_time.dt.normalize()
+    df["week_end"] = df["sample_collect_date"].dt.to_period("W-SAT").dt.end_time.dt.normalize()
 
     # Aggregate by state and week
     # Use concentration as the main signal
-    agg = df.groupby(['wwtp_jurisdiction', 'week_end']).agg({
-        'pcr_target_avg_conc_lin': 'mean',  # Linear concentration
-        'pcr_target_flowpop_lin': 'mean',   # Flow-population normalized
-        'population_served': 'sum',
-        'sewershed_id': 'nunique'
-    }).reset_index()
+    agg = (
+        df.groupby(["wwtp_jurisdiction", "week_end"])
+        .agg(
+            {
+                "pcr_target_avg_conc_lin": "mean",  # Linear concentration
+                "pcr_target_flowpop_lin": "mean",  # Flow-population normalized
+                "population_served": "sum",
+                "sewershed_id": "nunique",
+            }
+        )
+        .reset_index()
+    )
 
-    agg = agg.rename(columns={
-        'wwtp_jurisdiction': 'state',
-        'pcr_target_avg_conc_lin': 'flu_concentration',
-        'pcr_target_flowpop_lin': 'flu_flowpop',
-        'sewershed_id': 'flu_n_sites'
-    })
+    agg = agg.rename(
+        columns={
+            "wwtp_jurisdiction": "state",
+            "pcr_target_avg_conc_lin": "flu_concentration",
+            "pcr_target_flowpop_lin": "flu_flowpop",
+            "sewershed_id": "flu_n_sites",
+        }
+    )
 
     logger.info(f"Aggregated to {len(agg):,} state-week records")
     return agg
@@ -121,15 +129,11 @@ def main():
     project_root = script_dir.parent
     output_dir = project_root / args.output
 
-    df = fetch_flu_wastewater(
-        start_date=args.start_date,
-        limit=args.limit,
-        output_dir=output_dir
-    )
+    df = fetch_flu_wastewater(start_date=args.start_date, limit=args.limit, output_dir=output_dir)
 
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("FLU WASTEWATER DATA SUMMARY")
-    print("="*60)
+    print("=" * 60)
     print(f"Total records: {len(df):,}")
     print(f"Date range: {df['sample_collect_date'].min()} to {df['sample_collect_date'].max()}")
     print(f"States: {df['wwtp_jurisdiction'].nunique()}")

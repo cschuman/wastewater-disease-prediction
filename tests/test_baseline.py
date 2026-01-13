@@ -156,16 +156,20 @@ class TestNaiveBaseline:
 
     def test_naive_uses_last_value(self):
         """Test that naive baseline uses last training value."""
-        train = pd.DataFrame({
-            "state": ["CA"] * 5,
-            "week_end_date": pd.date_range("2024-01-01", periods=5, freq="W"),
-            "target": [10, 20, 30, 40, 50],
-        })
-        test = pd.DataFrame({
-            "state": ["CA"] * 2,
-            "week_end_date": pd.date_range("2024-02-05", periods=2, freq="W"),
-            "target": [55, 60],
-        })
+        train = pd.DataFrame(
+            {
+                "state": ["CA"] * 5,
+                "week_end_date": pd.date_range("2024-01-01", periods=5, freq="W"),
+                "target": [10, 20, 30, 40, 50],
+            }
+        )
+        test = pd.DataFrame(
+            {
+                "state": ["CA"] * 2,
+                "week_end_date": pd.date_range("2024-02-05", periods=2, freq="W"),
+                "target": [55, 60],
+            }
+        )
 
         results = naive_baseline(train, test, "target")
 

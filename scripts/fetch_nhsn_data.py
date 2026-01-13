@@ -22,16 +22,14 @@ import pandas as pd
 import requests
 
 # Security constants
-ALLOWED_DOMAINS = ['data.cdc.gov', 'healthdata.gov']
+ALLOWED_DOMAINS = ["data.cdc.gov", "healthdata.gov"]
 MAX_FILE_SIZE = 500 * 1024 * 1024  # 500 MB limit
 DEFAULT_TIMEOUT = 120
 MAX_TIMEOUT = 600
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
+
 
 def validate_url(url: str) -> str:
     """
@@ -49,7 +47,7 @@ def validate_url(url: str) -> str:
     parsed = urlparse(url)
 
     # Ensure HTTPS
-    if parsed.scheme != 'https':
+    if parsed.scheme != "https":
         raise ValueError(f"Only HTTPS URLs allowed, got: {parsed.scheme}")
 
     # Check domain whitelist
@@ -57,7 +55,7 @@ def validate_url(url: str) -> str:
         raise ValueError(f"Untrusted domain: {parsed.netloc}. Allowed: {ALLOWED_DOMAINS}")
 
     # Prevent localhost/internal network access
-    if parsed.hostname in ['localhost', '127.0.0.1', '0.0.0.0']:
+    if parsed.hostname in ["localhost", "127.0.0.1", "0.0.0.0"]:
         raise ValueError("Localhost access forbidden")
 
     return url
@@ -83,14 +81,14 @@ def validate_output_path(output_dir: str | Path, project_root: Path) -> Path:
     try:
         output_path.relative_to(project_root)
     except ValueError:
-        raise ValueError(
-            f"Output directory {output_path} is outside project root {project_root}"
-        )
+        raise ValueError(f"Output directory {output_path} is outside project root {project_root}")
 
     return output_path
 
 
-def fetch_csv_with_limit(url: str, timeout: int = DEFAULT_TIMEOUT, max_size: int = MAX_FILE_SIZE) -> pd.DataFrame:
+def fetch_csv_with_limit(
+    url: str, timeout: int = DEFAULT_TIMEOUT, max_size: int = MAX_FILE_SIZE
+) -> pd.DataFrame:
     """
     Fetch CSV with size limit to prevent DoS.
 
@@ -113,7 +111,7 @@ def fetch_csv_with_limit(url: str, timeout: int = DEFAULT_TIMEOUT, max_size: int
     response.raise_for_status()
 
     # Check Content-Length header
-    content_length = response.headers.get('Content-Length')
+    content_length = response.headers.get("Content-Length")
     if content_length and int(content_length) > max_size:
         raise ValueError(f"File too large: {content_length} bytes (max: {max_size})")
 
@@ -133,20 +131,20 @@ DATASETS = {
     "weekly_respiratory": {
         "url": "https://data.cdc.gov/api/views/ua7e-t2fy/rows.csv?accessType=DOWNLOAD",
         "name": "Weekly Hospital Respiratory Data (HRD) Metrics by Jurisdiction",
-        "description": "Weekly COVID-19, Influenza, and RSV hospital admissions by state"
+        "description": "Weekly COVID-19, Influenza, and RSV hospital admissions by state",
     },
     "historical_capacity": {
         "url": "https://healthdata.gov/api/views/g62h-syeh/rows.csv?accessType=DOWNLOAD",
         "name": "COVID-19 Reported Patient Impact and Hospital Capacity",
-        "description": "Historical hospital capacity data (through May 2024)"
-    }
+        "description": "Historical hospital capacity data (through May 2024)",
+    },
 }
 
 
 def fetch_nhsn_data(
     dataset_key: str = "weekly_respiratory",
     start_date: str | None = None,
-    output_dir: Path | None = None
+    output_dir: Path | None = None,
 ) -> pd.DataFrame:
     """
     Fetch NHSN hospital data.
@@ -194,7 +192,9 @@ def fetch_nhsn_data(
         if date_col:
             original_len = len(df)
             df = df[df[date_col] >= start_dt]
-            logger.info(f"Filtered from {original_len:,} to {len(df):,} records (from {start_date})")
+            logger.info(
+                f"Filtered from {original_len:,} to {len(df):,} records (from {start_date})"
+            )
 
     # Save if output directory specified
     if output_dir:
@@ -231,13 +231,17 @@ def print_data_summary(df: pd.DataFrame) -> None:
         print(f"Date range: {df[date_col].min()} to {df[date_col].max()}")
 
     # Count jurisdictions
-    jurisdiction_cols = [col for col in df.columns if "jurisdiction" in col.lower() or "state" in col.lower()]
+    jurisdiction_cols = [
+        col for col in df.columns if "jurisdiction" in col.lower() or "state" in col.lower()
+    ]
     if jurisdiction_cols:
         jur_col = jurisdiction_cols[0]
         print(f"Jurisdictions: {df[jur_col].nunique()}")
 
     # Identify admission columns
-    admission_cols = [col for col in df.columns if "admission" in col.lower() or "confirm" in col.lower()]
+    admission_cols = [
+        col for col in df.columns if "admission" in col.lower() or "confirm" in col.lower()
+    ]
     if admission_cols:
         print(f"\nAdmission columns found:")
         for col in admission_cols[:10]:  # Limit to first 10
@@ -250,10 +254,7 @@ def print_data_summary(df: pd.DataFrame) -> None:
         print(f"  ... and {len(df.columns) - 30} more")
 
 
-def create_combined_target(
-    df: pd.DataFrame,
-    output_dir: Path | None = None
-) -> pd.DataFrame:
+def create_combined_target(df: pd.DataFrame, output_dir: Path | None = None) -> pd.DataFrame:
     """
     Create the combined respiratory burden target variable.
 
@@ -263,7 +264,9 @@ def create_combined_target(
 
     # This will depend on the actual column names in the data
     # Common patterns in NHSN data:
-    covid_cols = [col for col in df.columns if "covid" in col.lower() and "admission" in col.lower()]
+    covid_cols = [
+        col for col in df.columns if "covid" in col.lower() and "admission" in col.lower()
+    ]
     flu_cols = [col for col in df.columns if "flu" in col.lower() and "admission" in col.lower()]
     rsv_cols = [col for col in df.columns if "rsv" in col.lower() and "admission" in col.lower()]
 
@@ -282,9 +285,9 @@ def create_combined_target(
     # Sum admissions (take first column of each type for now)
     if covid_cols and flu_cols and rsv_cols:
         result["total_respiratory_admissions"] = (
-            result[covid_cols[0]].fillna(0) +
-            result[flu_cols[0]].fillna(0) +
-            result[rsv_cols[0]].fillna(0)
+            result[covid_cols[0]].fillna(0)
+            + result[flu_cols[0]].fillna(0)
+            + result[rsv_cols[0]].fillna(0)
         )
         logger.info("Created total_respiratory_admissions column")
 
@@ -303,31 +306,21 @@ def create_combined_target(
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Fetch NHSN hospital respiratory data"
-    )
+    parser = argparse.ArgumentParser(description="Fetch NHSN hospital respiratory data")
     parser.add_argument(
         "--dataset",
         choices=["weekly_respiratory", "historical_capacity", "all"],
         default="weekly_respiratory",
-        help="Which dataset to fetch"
+        help="Which dataset to fetch",
     )
     parser.add_argument(
-        "--start-date",
-        type=str,
-        default="2023-01-01",
-        help="Start date for data (YYYY-MM-DD)"
+        "--start-date", type=str, default="2023-01-01", help="Start date for data (YYYY-MM-DD)"
     )
-    parser.add_argument(
-        "--output",
-        type=str,
-        default="data/raw/nhsn",
-        help="Output directory"
-    )
+    parser.add_argument("--output", type=str, default="data/raw/nhsn", help="Output directory")
     parser.add_argument(
         "--create-target",
         action="store_true",
-        help="Also create combined respiratory burden target variable"
+        help="Also create combined respiratory burden target variable",
     )
 
     args = parser.parse_args()
@@ -346,18 +339,14 @@ def main():
         for key in DATASETS:
             try:
                 df = fetch_nhsn_data(
-                    dataset_key=key,
-                    start_date=args.start_date,
-                    output_dir=output_dir
+                    dataset_key=key, start_date=args.start_date, output_dir=output_dir
                 )
                 print_data_summary(df)
             except (requests.exceptions.RequestException, ValueError) as e:
                 logger.error(f"Failed to fetch {key}: {e}")
     else:
         df = fetch_nhsn_data(
-            dataset_key=args.dataset,
-            start_date=args.start_date,
-            output_dir=output_dir
+            dataset_key=args.dataset, start_date=args.start_date, output_dir=output_dir
         )
         print_data_summary(df)
 

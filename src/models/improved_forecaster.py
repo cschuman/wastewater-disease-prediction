@@ -17,7 +17,7 @@ from sklearn.linear_model import Ridge
 from pathlib import Path
 
 
-def create_enhanced_features(df: pd.DataFrame, target: str = 'respiratory_total') -> pd.DataFrame:
+def create_enhanced_features(df: pd.DataFrame, target: str = "respiratory_total") -> pd.DataFrame:
     """
     Create enhanced features for better surge prediction.
     """
@@ -25,60 +25,70 @@ def create_enhanced_features(df: pd.DataFrame, target: str = 'respiratory_total'
 
     # Basic lag features
     for lag in [1, 2, 3, 4]:
-        df[f'{target}_lag{lag}'] = df[target].shift(lag)
+        df[f"{target}_lag{lag}"] = df[target].shift(lag)
 
     # Rolling statistics
-    df[f'{target}_roll2'] = df[target].rolling(2).mean()
-    df[f'{target}_roll4'] = df[target].rolling(4).mean()
+    df[f"{target}_roll2"] = df[target].rolling(2).mean()
+    df[f"{target}_roll4"] = df[target].rolling(4).mean()
 
     # MOMENTUM: Week-over-week change (rate of change)
-    df[f'{target}_change1'] = df[target].diff(1)
+    df[f"{target}_change1"] = df[target].diff(1)
     # Replace inf values that occur when dividing by zero
-    df[f'{target}_pct_change1'] = df[target].pct_change(1).replace([np.inf, -np.inf], np.nan) * 100
+    df[f"{target}_pct_change1"] = df[target].pct_change(1).replace([np.inf, -np.inf], np.nan) * 100
 
     # ACCELERATION: Change in the rate of change
-    df[f'{target}_accel'] = df[f'{target}_change1'].diff(1)
+    df[f"{target}_accel"] = df[f"{target}_change1"].diff(1)
 
     # Lagged momentum (what was the trend last week?)
-    df[f'{target}_change1_lag1'] = df[f'{target}_change1'].shift(1)
-    df[f'{target}_pct_change1_lag1'] = df[f'{target}_pct_change1'].shift(1)
+    df[f"{target}_change1_lag1"] = df[f"{target}_change1"].shift(1)
+    df[f"{target}_pct_change1_lag1"] = df[f"{target}_pct_change1"].shift(1)
 
     # Wastewater momentum
-    if 'covid_ww_percentile' in df.columns:
-        df['ww_change1'] = df['covid_ww_percentile'].diff(1)
+    if "covid_ww_percentile" in df.columns:
+        df["ww_change1"] = df["covid_ww_percentile"].diff(1)
         # Replace inf values that occur when dividing by zero
-        df['ww_pct_change1'] = df['covid_ww_percentile'].pct_change(1).replace([np.inf, -np.inf], np.nan) * 100
-        df['ww_change1_lag1'] = df['ww_change1'].shift(1)
+        df["ww_pct_change1"] = (
+            df["covid_ww_percentile"].pct_change(1).replace([np.inf, -np.inf], np.nan) * 100
+        )
+        df["ww_change1_lag1"] = df["ww_change1"].shift(1)
 
     # Ratio to recent baseline (detecting deviation from normal)
     # Replace zeros with NaN before division to avoid inf
-    roll4_shifted = df[f'{target}_roll4'].shift(1).replace(0, np.nan)
-    df[f'{target}_ratio_to_roll4'] = df[target] / roll4_shifted
+    roll4_shifted = df[f"{target}_roll4"].shift(1).replace(0, np.nan)
+    df[f"{target}_ratio_to_roll4"] = df[target] / roll4_shifted
 
     # Seasonal features
-    df['week_of_year'] = df['week_end_date'].dt.isocalendar().week.astype(int)
-    df['month'] = df['week_end_date'].dt.month
+    df["week_of_year"] = df["week_end_date"].dt.isocalendar().week.astype(int)
+    df["month"] = df["week_end_date"].dt.month
 
     # Winter flag (higher weight on recent data during winter)
-    df['is_winter'] = df['month'].isin([11, 12, 1, 2, 3]).astype(int)
+    df["is_winter"] = df["month"].isin([11, 12, 1, 2, 3]).astype(int)
 
     return df
 
 
-def get_feature_cols(df: pd.DataFrame, target: str = 'respiratory_total') -> list:
+def get_feature_cols(df: pd.DataFrame, target: str = "respiratory_total") -> list:
     """Get the enhanced feature columns."""
     base_features = [
-        f'{target}_lag1', f'{target}_lag2', f'{target}_lag3', f'{target}_lag4',
-        f'{target}_roll2', f'{target}_roll4',
-        f'{target}_change1', f'{target}_pct_change1',
-        f'{target}_accel',
-        f'{target}_change1_lag1', f'{target}_pct_change1_lag1',
-        f'{target}_ratio_to_roll4',
-        'week_of_year', 'month', 'is_winter'
+        f"{target}_lag1",
+        f"{target}_lag2",
+        f"{target}_lag3",
+        f"{target}_lag4",
+        f"{target}_roll2",
+        f"{target}_roll4",
+        f"{target}_change1",
+        f"{target}_pct_change1",
+        f"{target}_accel",
+        f"{target}_change1_lag1",
+        f"{target}_pct_change1_lag1",
+        f"{target}_ratio_to_roll4",
+        "week_of_year",
+        "month",
+        "is_winter",
     ]
 
     # Add wastewater features if available
-    ww_features = ['covid_ww_percentile', 'ww_change1', 'ww_pct_change1', 'ww_change1_lag1']
+    ww_features = ["covid_ww_percentile", "ww_change1", "ww_pct_change1", "ww_change1_lag1"]
 
     feature_cols = []
     for f in base_features + ww_features:
@@ -102,41 +112,35 @@ class EnsembleForecaster:
         """Fit all models in the ensemble."""
 
         # XGBoost - good at capturing non-linear patterns
-        self.models['xgb'] = xgb.XGBRegressor(
+        self.models["xgb"] = xgb.XGBRegressor(
             n_estimators=150,
             max_depth=6,
             learning_rate=0.08,
             subsample=0.8,
             colsample_bytree=0.8,
             random_state=42,
-            n_jobs=-1
+            n_jobs=-1,
         )
-        self.models['xgb'].fit(X, y, sample_weight=sample_weight, verbose=False)
+        self.models["xgb"].fit(X, y, sample_weight=sample_weight, verbose=False)
 
         # Gradient Boosting - different regularization
-        self.models['gbm'] = GradientBoostingRegressor(
-            n_estimators=100,
-            max_depth=5,
-            learning_rate=0.1,
-            random_state=42
+        self.models["gbm"] = GradientBoostingRegressor(
+            n_estimators=100, max_depth=5, learning_rate=0.1, random_state=42
         )
-        self.models['gbm'].fit(X, y, sample_weight=sample_weight)
+        self.models["gbm"].fit(X, y, sample_weight=sample_weight)
 
         # Random Forest - captures variance
-        self.models['rf'] = RandomForestRegressor(
-            n_estimators=100,
-            max_depth=8,
-            random_state=42,
-            n_jobs=-1
+        self.models["rf"] = RandomForestRegressor(
+            n_estimators=100, max_depth=8, random_state=42, n_jobs=-1
         )
-        self.models['rf'].fit(X, y, sample_weight=sample_weight)
+        self.models["rf"].fit(X, y, sample_weight=sample_weight)
 
         # Ridge - linear baseline
-        self.models['ridge'] = Ridge(alpha=1.0)
-        self.models['ridge'].fit(X, y, sample_weight=sample_weight)
+        self.models["ridge"] = Ridge(alpha=1.0)
+        self.models["ridge"].fit(X, y, sample_weight=sample_weight)
 
         # Default equal weights
-        self.weights = {'xgb': 0.4, 'gbm': 0.3, 'rf': 0.2, 'ridge': 0.1}
+        self.weights = {"xgb": 0.4, "gbm": 0.3, "rf": 0.2, "ridge": 0.1}
 
         return self
 
@@ -156,10 +160,10 @@ class EnsembleForecaster:
         if self.use_adaptive_weights and recent_momentum is not None:
             if abs(recent_momentum) > 20:  # >20% week-over-week change
                 # During surges, trust tree-based models more
-                weights = {'xgb': 0.5, 'gbm': 0.35, 'rf': 0.1, 'ridge': 0.05}
+                weights = {"xgb": 0.5, "gbm": 0.35, "rf": 0.1, "ridge": 0.05}
 
         # Weighted average
-        ensemble_pred = np.zeros_like(predictions['xgb'])
+        ensemble_pred = np.zeros_like(predictions["xgb"])
         for name, pred in predictions.items():
             ensemble_pred += weights[name] * pred
 
@@ -180,7 +184,7 @@ def run_improved_backtest(
     target: str = "respiratory_total",
     test_start: str = "2024-11-01",
     test_end: str = "2025-03-01",
-    horizon: int = 1
+    horizon: int = 1,
 ) -> dict:
     """
     Run backtest with improved model.
@@ -192,17 +196,23 @@ def run_improved_backtest(
     df = create_multi_pathogen_features(merged)
 
     # Aggregate to national level
-    national = df.groupby('week_end_date').agg({
-        'covid_hosp': 'sum',
-        'flu_hosp': 'sum',
-        'rsv_hosp': 'sum',
-        'respiratory_total': 'sum',
-        'covid_ww_percentile': 'mean',
-        'flu_ww_conc': 'mean',
-    }).reset_index()
+    national = (
+        df.groupby("week_end_date")
+        .agg(
+            {
+                "covid_hosp": "sum",
+                "flu_hosp": "sum",
+                "rsv_hosp": "sum",
+                "respiratory_total": "sum",
+                "covid_ww_percentile": "mean",
+                "flu_ww_conc": "mean",
+            }
+        )
+        .reset_index()
+    )
 
-    national['week_end_date'] = pd.to_datetime(national['week_end_date'])
-    national = national.sort_values('week_end_date').reset_index(drop=True)
+    national["week_end_date"] = pd.to_datetime(national["week_end_date"])
+    national = national.sort_values("week_end_date").reset_index(drop=True)
 
     # Create enhanced features
     national = create_enhanced_features(national, target)
@@ -215,7 +225,7 @@ def run_improved_backtest(
             national[col] = national[col].fillna(national[col].median())
 
     # Get test period indices
-    test_mask = (national['week_end_date'] >= test_start) & (national['week_end_date'] <= test_end)
+    test_mask = (national["week_end_date"] >= test_start) & (national["week_end_date"] <= test_end)
     test_indices = national[test_mask].index.tolist()
 
     if len(test_indices) == 0:
@@ -241,7 +251,11 @@ def run_improved_backtest(
         ensemble.fit(X_train, y_train, sample_weight=sample_weights)
 
         # Get recent momentum for adaptive prediction
-        recent_momentum = train_df[f'{target}_pct_change1'].iloc[-1] if f'{target}_pct_change1' in train_df.columns else 0
+        recent_momentum = (
+            train_df[f"{target}_pct_change1"].iloc[-1]
+            if f"{target}_pct_change1" in train_df.columns
+            else 0
+        )
 
         # Predict
         for h in range(horizon):
@@ -249,38 +263,36 @@ def run_improved_backtest(
             if pred_idx > test_end_idx:
                 break
 
-            X_pred = national.iloc[pred_idx:pred_idx+1][feature_cols].values
+            X_pred = national.iloc[pred_idx : pred_idx + 1][feature_cols].values
             prediction = ensemble.predict(X_pred, recent_momentum=recent_momentum)[0]
             actual = national.iloc[pred_idx][target]
-            pred_date = national.iloc[pred_idx]['week_end_date']
+            pred_date = national.iloc[pred_idx]["week_end_date"]
 
-            results.append({
-                'date': pred_date,
-                'actual': actual,
-                'predicted': prediction,
-                'horizon': h + 1
-            })
+            results.append(
+                {"date": pred_date, "actual": actual, "predicted": prediction, "horizon": h + 1}
+            )
 
     results_df = pd.DataFrame(results)
-    results_df = results_df[results_df['horizon'] == horizon]
+    results_df = results_df[results_df["horizon"] == horizon]
 
-    mae = np.mean(np.abs(results_df['actual'] - results_df['predicted']))
+    mae = np.mean(np.abs(results_df["actual"] - results_df["predicted"]))
 
     # MAPE calculation with zero protection (matching baseline.py approach)
-    nonzero_mask = results_df['actual'] != 0
+    nonzero_mask = results_df["actual"] != 0
     if nonzero_mask.sum() > 0:
-        mape = np.mean(np.abs(
-            (results_df['actual'][nonzero_mask] - results_df['predicted'][nonzero_mask]) /
-            results_df['actual'][nonzero_mask]
-        )) * 100
+        mape = (
+            np.mean(
+                np.abs(
+                    (results_df["actual"][nonzero_mask] - results_df["predicted"][nonzero_mask])
+                    / results_df["actual"][nonzero_mask]
+                )
+            )
+            * 100
+        )
     else:
         mape = np.nan
 
-    return {
-        'mae': mae,
-        'mape': mape,
-        'results': results_df
-    }
+    return {"mae": mae, "mape": mape, "results": results_df}
 
 
 if __name__ == "__main__":
