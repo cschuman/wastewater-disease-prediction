@@ -3,8 +3,5 @@ import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-	plugins: [sveltekit(), tailwindcss()],
-	resolve: {
-		extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.svelte']
-	}
+	plugins: [sveltekit(), tailwindcss()]
 });

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { PageData } from './$types';
-	import { Badge, MetricCard } from '$lib/components/ui/index.js';
+	import Badge from '$lib/components/ui/Badge.svelte';
+	import MetricCard from '$lib/components/ui/MetricCard.svelte';
 	import { formatPopulation, formatNumber } from '$lib/utils/formatters';
 
 	let { data }: { data: PageData } = $props();
