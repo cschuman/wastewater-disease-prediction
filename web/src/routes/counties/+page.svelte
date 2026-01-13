@@ -99,6 +99,17 @@
 		currentPage = 1;
 	}
 
+	// Escape CSV values to prevent injection and handle special characters
+	function escapeCsvValue(value: string | number): string {
+		const str = String(value);
+		// If contains comma, quote, newline, or starts with formula char, wrap in quotes
+		if (/[,"\n\r]/.test(str) || /^[=+\-@\t\r]/.test(str)) {
+			// Escape quotes by doubling them, and wrap in quotes
+			return `"${str.replace(/"/g, '""')}"`;
+		}
+		return str;
+	}
+
 	function exportCSV() {
 		const counties = filteredCounties;
 		const headers = [
@@ -115,16 +126,16 @@
 		];
 
 		const rows = counties.map((c) => [
-			c.fips,
-			c.county_name,
-			c.state,
-			c.population,
-			c.svi_overall.toFixed(4),
-			c.svi_quartile,
-			c.n_sites,
-			c.coverage_pct.toFixed(2),
-			c.priority_score.toFixed(2),
-			c.priority_tier
+			escapeCsvValue(c.fips),
+			escapeCsvValue(c.county_name),
+			escapeCsvValue(c.state),
+			escapeCsvValue(c.population),
+			escapeCsvValue(c.svi_overall.toFixed(4)),
+			escapeCsvValue(c.svi_quartile),
+			escapeCsvValue(c.n_sites),
+			escapeCsvValue(c.coverage_pct.toFixed(2)),
+			escapeCsvValue(c.priority_score.toFixed(2)),
+			escapeCsvValue(c.priority_tier)
 		]);
 
 		const csv = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
@@ -319,7 +330,11 @@
 		<!-- Pagination -->
 		<div class="flex items-center justify-between px-4 py-3 border-t bg-gray-50">
 			<div class="text-sm text-gray-500">
-				Showing {(currentPage - 1) * pageSize + 1} to {Math.min(currentPage * pageSize, filteredCounties.length)} of {filteredCounties.length}
+				{#if filteredCounties.length === 0}
+					No results found
+				{:else}
+					Showing {(currentPage - 1) * pageSize + 1} to {Math.min(currentPage * pageSize, filteredCounties.length)} of {filteredCounties.length}
+				{/if}
 			</div>
 			<div class="flex gap-1">
 				<button

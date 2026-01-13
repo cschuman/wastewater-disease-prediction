@@ -8,6 +8,7 @@ Source: https://data.cdc.gov/Public-Health-Surveillance/CDC-Wastewater-Data-for-
 
 import argparse
 import logging
+import re
 from datetime import datetime
 from pathlib import Path
 
@@ -16,6 +17,73 @@ from sodapy import Socrata
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
+
+
+def validate_date(date_str: str) -> str:
+    """
+    Validate date string format to prevent SOQL injection.
+
+    Args:
+        date_str: Date string in YYYY-MM-DD format
+
+    Returns:
+        Validated date string
+
+    Raises:
+        ValueError: If date format is invalid
+    """
+    if not re.match(r"^\d{4}-\d{2}-\d{2}$", date_str):
+        raise ValueError(f"Invalid date format: {date_str}. Expected YYYY-MM-DD")
+
+    # Parse to ensure it's a real date
+    try:
+        datetime.strptime(date_str, "%Y-%m-%d")
+    except ValueError:
+        raise ValueError(f"Invalid date: {date_str}")
+
+    return date_str
+
+
+def validate_output_path(output_dir: str | Path, project_root: Path) -> Path:
+    """
+    Validate output directory to prevent path traversal attacks.
+
+    Args:
+        output_dir: User-provided output directory
+        project_root: Absolute path to project root
+
+    Returns:
+        Validated absolute path
+
+    Raises:
+        ValueError: If path escapes project root
+    """
+    output_path = Path(output_dir).resolve()
+    project_root = project_root.resolve()
+
+    # Ensure path is within project root
+    try:
+        output_path.relative_to(project_root)
+    except ValueError:
+        raise ValueError(f"Output directory {output_path} is outside project root {project_root}")
+
+    return output_path
+
+
+def validate_limit(value: str) -> int:
+    """Validate limit argument."""
+    try:
+        ivalue = int(value)
+    except ValueError:
+        raise argparse.ArgumentTypeError(f"Invalid integer: {value}")
+
+    if ivalue < 1:
+        raise argparse.ArgumentTypeError(f"Limit must be positive, got: {ivalue}")
+
+    if ivalue > 10_000_000:
+        raise argparse.ArgumentTypeError(f"Limit too large: {ivalue} (max: 10M)")
+
+    return ivalue
 
 CDC_DOMAIN = "data.cdc.gov"
 FLU_DATASET_ID = "ymmh-divb"
@@ -39,7 +107,9 @@ def fetch_flu_wastewater(
 
     client = Socrata(CDC_DOMAIN, None)
 
-    where_clause = f"sample_collect_date >= '{start_date}'"
+    # Validate date to prevent SOQL injection
+    validated_date = validate_date(start_date)
+    where_clause = f"sample_collect_date >= '{validated_date}'"
     logger.info(f"Filter: {where_clause}")
 
     results = client.get(
@@ -121,13 +191,19 @@ def main():
     parser = argparse.ArgumentParser(description="Fetch Influenza A wastewater data")
     parser.add_argument("--start-date", default="2024-01-01", help="Start date (YYYY-MM-DD)")
     parser.add_argument("--output", default="data/raw/flu_wastewater", help="Output directory")
-    parser.add_argument("--limit", type=int, default=500000, help="Max records")
+    parser.add_argument("--limit", type=validate_limit, default=500000, help="Max records (1-10,000,000)")
 
     args = parser.parse_args()
 
     script_dir = Path(__file__).parent
     project_root = script_dir.parent
-    output_dir = project_root / args.output
+
+    # Validate output path to prevent path traversal
+    try:
+        output_dir = validate_output_path(project_root / args.output, project_root)
+    except ValueError as e:
+        logger.error(f"Invalid output path: {e}")
+        exit(1)
 
     df = fetch_flu_wastewater(start_date=args.start_date, limit=args.limit, output_dir=output_dir)
 

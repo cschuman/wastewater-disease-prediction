@@ -25,6 +25,26 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 
 # State abbreviation mapping
+def get_latest_file(directory: Path, pattern: str) -> Path:
+    """
+    Get the most recent file matching a pattern.
+
+    Args:
+        directory: Directory to search in
+        pattern: Glob pattern to match files
+
+    Returns:
+        Path to the most recent matching file
+
+    Raises:
+        FileNotFoundError: If no matching files found
+    """
+    files = sorted(directory.glob(pattern))
+    if not files:
+        raise FileNotFoundError(f"No files matching '{pattern}' found in {directory}")
+    return files[-1]  # Return most recent (sorted alphabetically, dates sort correctly)
+
+
 STATE_ABBREV = {
     "Alabama": "AL",
     "Alaska": "AK",
@@ -91,7 +111,7 @@ def load_and_merge_data(data_dir: Path) -> pd.DataFrame:
     data_dir = Path(data_dir)
 
     # Load COVID wastewater
-    covid_ww_file = list((data_dir / "raw" / "nwss").glob("*.parquet"))[0]
+    covid_ww_file = get_latest_file(data_dir / "raw" / "nwss", "*.parquet")
     covid_ww = pd.read_parquet(covid_ww_file)
     logger.info(f"Loaded COVID wastewater: {len(covid_ww):,} records")
 
@@ -131,7 +151,7 @@ def load_and_merge_data(data_dir: Path) -> pd.DataFrame:
     covid_agg = covid_agg.drop(columns=["pop_weighted_percentile", "population_served"])
 
     # Load Flu wastewater
-    flu_ww_file = list((data_dir / "raw" / "flu_wastewater").glob("*.parquet"))[0]
+    flu_ww_file = get_latest_file(data_dir / "raw" / "flu_wastewater", "*.parquet")
     flu_ww = pd.read_parquet(flu_ww_file)
     logger.info(f"Loaded Flu wastewater: {len(flu_ww):,} records")
 
@@ -166,7 +186,7 @@ def load_and_merge_data(data_dir: Path) -> pd.DataFrame:
     )
 
     # Load Hospital data
-    hosp_file = list((data_dir / "raw" / "nhsn").glob("*.parquet"))[0]
+    hosp_file = get_latest_file(data_dir / "raw" / "nhsn", "*.parquet")
     hosp = pd.read_parquet(hosp_file)
     logger.info(f"Loaded Hospital data: {len(hosp):,} records")
 

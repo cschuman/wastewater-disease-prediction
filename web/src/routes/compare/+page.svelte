@@ -46,8 +46,8 @@
 	const county1 = $derived((data.counties as County[]).find(c => c.fips === county1Fips));
 	const county2 = $derived((data.counties as County[]).find(c => c.fips === county2Fips));
 
-	// Filter counties for search
-	const filteredCounties1 = $derived(() => {
+	// Filter counties for search - use $derived.by for complex logic per CLAUDE.md
+	const filteredCounties1 = $derived.by(() => {
 		if (!search1) return [];
 		const term = search1.toLowerCase();
 		return (data.counties as County[])
@@ -59,7 +59,7 @@
 			.slice(0, 10);
 	});
 
-	const filteredCounties2 = $derived(() => {
+	const filteredCounties2 = $derived.by(() => {
 		if (!search2) return [];
 		const term = search2.toLowerCase();
 		return (data.counties as County[])
@@ -121,9 +121,9 @@
 		};
 	}
 
-	// Calculate sites per 100k for both counties
-	const sitesPer100k1 = $derived(county1 ? (county1.n_sites / county1.population) * 100000 : 0);
-	const sitesPer100k2 = $derived(county2 ? (county2.n_sites / county2.population) * 100000 : 0);
+	// Calculate sites per 100k for both counties (guard against division by zero)
+	const sitesPer100k1 = $derived(county1 && county1.population > 0 ? (county1.n_sites / county1.population) * 100000 : 0);
+	const sitesPer100k2 = $derived(county2 && county2.population > 0 ? (county2.n_sites / county2.population) * 100000 : 0);
 
 	// Pre-compute all comparison classes
 	const popComp = $derived(getComparisonClass(county1?.population, county2?.population, true));
@@ -172,9 +172,9 @@
 						placeholder="Search by county name, state, or FIPS..."
 						class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
 					/>
-					{#if showDropdown1 && filteredCounties1().length > 0}
+					{#if showDropdown1 && filteredCounties1.length > 0}
 						<div class="absolute z-10 w-full mt-1 bg-white border rounded-lg shadow-lg max-h-60 overflow-y-auto">
-							{#each filteredCounties1() as county}
+							{#each filteredCounties1 as county}
 								<button
 									onmousedown={() => selectCounty1(county)}
 									class="w-full px-4 py-2 text-left hover:bg-gray-100 flex justify-between items-center"
@@ -210,9 +210,9 @@
 						placeholder="Search by county name, state, or FIPS..."
 						class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
 					/>
-					{#if showDropdown2 && filteredCounties2().length > 0}
+					{#if showDropdown2 && filteredCounties2.length > 0}
 						<div class="absolute z-10 w-full mt-1 bg-white border rounded-lg shadow-lg max-h-60 overflow-y-auto">
-							{#each filteredCounties2() as county}
+							{#each filteredCounties2 as county}
 								<button
 									onmousedown={() => selectCounty2(county)}
 									class="w-full px-4 py-2 text-left hover:bg-gray-100 flex justify-between items-center"
@@ -290,8 +290,8 @@
 					<!-- Coverage -->
 					<tr class="hover:bg-gray-50">
 						<td class="px-4 py-3 text-gray-500">Coverage %</td>
-						<td class="px-4 py-3 text-center {covComp.class1}">{(county1.coverage_pct * 100).toFixed(1)}%</td>
-						<td class="px-4 py-3 text-center {covComp.class2}">{(county2.coverage_pct * 100).toFixed(1)}%</td>
+						<td class="px-4 py-3 text-center {covComp.class1}">{county1.coverage_pct.toFixed(1)}%</td>
+						<td class="px-4 py-3 text-center {covComp.class2}">{county2.coverage_pct.toFixed(1)}%</td>
 					</tr>
 
 					<!-- SVI Overall -->

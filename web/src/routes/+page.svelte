@@ -47,7 +47,7 @@
 		/>
 		<MetricCard
 			label="Per-Capita Gap"
-			value="{(summary.q1_sites_per_million / summary.q4_sites_per_million).toFixed(1)}x"
+			value="{summary.q4_sites_per_million > 0 ? (summary.q1_sites_per_million / summary.q4_sites_per_million).toFixed(1) : 'N/A'}x"
 			subtext="Q1 vs Q4 disparity ratio"
 			variant="warning"
 		/>

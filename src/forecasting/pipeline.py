@@ -325,16 +325,33 @@ class ForecastingPipeline:
         return max(0, prediction)  # No negative hospitalizations
 
     def save_models(self):
-        """Save trained models to disk."""
+        """Save trained models to disk using atomic writes to prevent corruption."""
         self.model_dir.mkdir(parents=True, exist_ok=True)
 
         for target, model in self.models.items():
             path = self.model_dir / f"forecast_model_{target}.joblib"
-            joblib.dump(model, path)
-            logger.info(f"Saved {path}")
+            # Use atomic write: write to temp file, then rename
+            temp_path = path.with_suffix(".tmp")
+            try:
+                joblib.dump(model, temp_path)
+                temp_path.rename(path)  # Atomic on POSIX systems
+                logger.info(f"Saved {path}")
+            except Exception as e:
+                # Clean up temp file on failure
+                if temp_path.exists():
+                    temp_path.unlink()
+                raise e
 
-        # Save feature columns
-        joblib.dump(self.feature_cols, self.model_dir / "feature_cols.joblib")
+        # Save feature columns atomically
+        feat_path = self.model_dir / "feature_cols.joblib"
+        temp_feat_path = feat_path.with_suffix(".tmp")
+        try:
+            joblib.dump(self.feature_cols, temp_feat_path)
+            temp_feat_path.rename(feat_path)
+        except Exception as e:
+            if temp_feat_path.exists():
+                temp_feat_path.unlink()
+            raise e
 
     def load_models(self):
         """Load trained models from disk."""

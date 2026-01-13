@@ -7,9 +7,16 @@ from pathlib import Path
 from datetime import datetime, timedelta
 
 
+@pytest.fixture(autouse=True)
+def set_random_seed():
+    """Set random seed for reproducible tests."""
+    np.random.seed(42)
+
+
 @pytest.fixture
 def sample_wastewater_data():
     """Generate sample wastewater surveillance data."""
+    np.random.seed(42)  # Fixed seed for reproducibility
     dates = pd.date_range(start="2024-01-01", periods=20, freq="W")
     states = ["CA", "TX", "NY"]
 

@@ -146,6 +146,11 @@ def evaluate_predictions(y_true: np.ndarray, y_pred: np.ndarray, model_name: str
             * 100
         )
     else:
+        # Warn when MAPE cannot be computed - this affects model comparison
+        logger.warning(
+            f"MAPE for {model_name} is NaN because all actual values are zero. "
+            "This may affect model comparison. Consider using MAE or RMSE instead."
+        )
         mape = np.nan
 
     return ModelResults(

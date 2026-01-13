@@ -53,9 +53,12 @@ def create_enhanced_features(df: pd.DataFrame, target: str = "respiratory_total"
         df["ww_change1_lag1"] = df["ww_change1"].shift(1)
 
     # Ratio to recent baseline (detecting deviation from normal)
-    # Replace zeros with NaN before division to avoid inf
-    roll4_shifted = df[f"{target}_roll4"].shift(1).replace(0, np.nan)
+    # Replace zeros and near-zeros with NaN to avoid inf and extreme outliers
+    roll4_shifted = df[f"{target}_roll4"].shift(1)
+    roll4_shifted = roll4_shifted.where(roll4_shifted.abs() > 1e-6, np.nan)
     df[f"{target}_ratio_to_roll4"] = df[target] / roll4_shifted
+    # Clip extreme ratios to prevent outlier poisoning in model training
+    df[f"{target}_ratio_to_roll4"] = df[f"{target}_ratio_to_roll4"].clip(lower=0.01, upper=100)
 
     # Seasonal features
     df["week_of_year"] = df["week_end_date"].dt.isocalendar().week.astype(int)

@@ -26,6 +26,26 @@ import warnings
 warnings.filterwarnings("ignore")
 
 
+def get_latest_file(directory: Path, pattern: str) -> Path:
+    """
+    Get the most recent file matching a pattern.
+
+    Args:
+        directory: Directory to search in
+        pattern: Glob pattern to match files
+
+    Returns:
+        Path to the most recent matching file
+
+    Raises:
+        FileNotFoundError: If no matching files found
+    """
+    files = sorted(directory.glob(pattern))
+    if not files:
+        raise FileNotFoundError(f"No files matching '{pattern}' found in {directory}")
+    return files[-1]  # Return most recent (sorted alphabetically, dates sort correctly)
+
+
 # COST ASSUMPTIONS (2024 estimates based on CDC/EPA guidance)
 COST_PER_SITE_SETUP = 100000  # Initial setup: equipment, lab, protocols ($50k-$150k)
 COST_PER_SITE_ANNUAL = 50000  # Annual operating: testing, staffing, QA/QC
@@ -80,7 +100,9 @@ def load_county_svi(data_dir: Path = Path("data")) -> pd.DataFrame:
 
 def load_county_wastewater(data_dir: Path = Path("data")) -> pd.DataFrame:
     """Load wastewater data and aggregate to county level."""
-    nwss = pd.read_parquet(data_dir / "raw" / "nwss" / "nwss_metrics_20260111.parquet")
+    nwss_dir = data_dir / "raw" / "nwss"
+    nwss_file = get_latest_file(nwss_dir, "nwss_metrics_*.parquet")
+    nwss = pd.read_parquet(nwss_file)
 
     # Handle multi-county sewersheds - take first county (primary)
     nwss["fips"] = nwss["county_fips"].str.split(",").str[0].str.strip()
