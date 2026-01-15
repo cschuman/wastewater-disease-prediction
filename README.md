@@ -1,6 +1,7 @@
 # Wastewater Disease Prediction
 
 [![CI](https://github.com/cschuman/wastewater-disease-prediction/actions/workflows/ci.yml/badge.svg)](https://github.com/cschuman/wastewater-disease-prediction/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/cschuman/wastewater-disease-prediction/branch/main/graph/badge.svg)](https://codecov.io/gh/cschuman/wastewater-disease-prediction)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
@@ -122,6 +123,18 @@ jupyter lab notebooks/01_data_exploration.ipynb
 ## Documentation
 
 - [Full Research Report](reports/wastewater-disease-prediction-report.md) - Comprehensive project scoping
+- [Roadmap](ROADMAP.md) - Project direction and planned features
+- [Contributing Guide](CONTRIBUTING.md) - How to contribute
+- [Governance](GOVERNANCE.md) - Decision-making process
+- [Stability Policy](STABILITY.md) - API compatibility guarantees
+- [Security Policy](SECURITY.md) - Reporting vulnerabilities
+
+## Community
+
+We welcome contributions! See our [Contributor Ladder](docs/CONTRIBUTOR_LADDER.md) for the path from first PR to maintainer.
+
+- [GitHub Discussions](https://github.com/cschuman/wastewater-disease-prediction/discussions) - Questions and ideas
+- [Issue Tracker](https://github.com/cschuman/wastewater-disease-prediction/issues) - Bugs and feature requests
 
 ## References
 
