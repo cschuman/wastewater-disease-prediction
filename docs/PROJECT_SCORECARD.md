@@ -15,9 +15,9 @@
 | **Tier 3: Sustainable** | IN PROGRESS | 3/6 |
 | **Tier 4: Exemplary** | STARTED | 2/8 |
 
-**Overall Score: 72/100 (Silver) — Up from 52**
+**Overall Score: 76/100 (Gold) — Up from 52**
 
-**Next Milestone: 75/100 (Gold)**
+**Milestone Achieved: Gold**
 
 ---
 
@@ -27,6 +27,7 @@
 |------|-------|------|-------|-------|
 | 2025-01-14 | 52/100 | Bronze | — | Initial assessment |
 | 2025-01-14 | 72/100 | Silver | +20 | Gold Package implemented |
+| 2025-01-14 | 76/100 | **Gold** | +4 | OpenSSF Passing badge achieved |
 
 ---
 
@@ -53,9 +54,9 @@
 | Testing | YES | 127 tests, CI with coverage reporting | 4/4 |
 | Code Quality | YES | Black + Ruff + pre-commit, mypy in CI | 4/4 |
 | Release Process | PARTIAL | CI builds, but no signed releases yet | 2/4 |
-| OpenSSF Badge | NO | Not registered (ACTION NEEDED) | 0/4 |
+| OpenSSF Badge | YES | Passing badge achieved | 4/4 |
 
-**Tier 2 Score: 18/24** (+1 from coverage)
+**Tier 2 Score: 22/24** (+5 from coverage + OpenSSF)
 
 ---
 
@@ -108,58 +109,24 @@
 
 ---
 
-## Remaining Gap to Gold (75+)
+## Gold Achieved!
 
-| Action | Points | Effort | Status |
-|--------|--------|--------|--------|
-| OpenSSF Passing Badge | +4 | 2hr | TODO |
-| Create good-first-issue labels | +1 | 15min | TODO |
-| Signed releases | +2 | 1hr | TODO |
-| **TOTAL NEEDED** | **+3** | **~3hr** | |
-
-**You are 3 points from Gold.**
+| Action | Points | Status |
+|--------|--------|--------|
+| OpenSSF Passing Badge | +4 | DONE |
+| GitHub Discussions enabled | +0 | DONE |
+| Issue labels created | +1 | DONE |
+| **GOLD STATUS** | **76/100** | **ACHIEVED** |
 
 ---
 
-## Quick Wins to Gold
+## What Gold Means
 
-### 1. OpenSSF Badge (Today)
-```
-1. Go to https://bestpractices.dev/en
-2. Click "Get Your Badge Now"
-3. Log in with GitHub
-4. Add project: cschuman/wastewater-disease-prediction
-5. Fill out questionnaire (most answers are YES)
-6. Add badge to README
-```
-**Points: +4**
+At **Gold (76/100)**, you can credibly say:
 
-### 2. Good First Issue Labels (15 minutes)
-```
-1. Go to GitHub Issues
-2. Create label "good first issue" (green)
-3. Create label "help wanted" (yellow)
-4. Tag 3-5 appropriate issues
-```
-**Points: +1**
-
-### 3. Signed Releases (Optional for Gold)
-```
-1. Generate GPG key
-2. Add to GitHub
-3. Update release workflow
-```
-**Points: +2**
-
----
-
-## What Gold Unlocks
-
-At **Gold (75+)**, you can credibly say:
-
-- "This project has professional governance"
-- "We have a public roadmap and stability policy"
-- "There's a clear path to becoming a contributor"
+- "This project follows OpenSSF security best practices"
+- "We have professional governance and a public roadmap"
+- "There's a clear path from contributor to maintainer"
 - "We're working toward foundation-level maturity"
 
 ---
@@ -199,6 +166,8 @@ Platinum requires **people**, not just documents.
 
 ## Next Assessment
 
-**Target:** After OpenSSF badge registration
+**Target:** After recruiting second maintainer
 
-**Expected Score:** 76-78/100 (Gold)
+**Current Score:** 76/100 (Gold)
+**Next Target:** 85/100 (High Gold)
+**Platinum Target:** 90/100
