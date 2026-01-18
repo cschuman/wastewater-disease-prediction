@@ -109,17 +109,24 @@
 		</div>
 	</div>
 
-	<!-- ROI callout -->
-	<div class="bg-green-50 border border-green-200 rounded-lg p-6">
-		<h2 class="text-lg font-semibold text-green-900">Return on Investment</h2>
-		<p class="text-green-700 mt-2">
-			For every <strong>$1 invested</strong>, save <strong>$5-15</strong> in outbreak response and disease burden costs.
+	<!-- What This Analysis Demonstrates -->
+	<div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
+		<h2 class="text-lg font-semibold text-blue-900">What This Analysis Demonstrates</h2>
+		<p class="text-blue-700 mt-2">
+			<strong>Infrastructure equity gap confirmed:</strong> High-SVI counties have 33% fewer monitoring sites per capita (p=0.0001).
 		</p>
-		<ul class="mt-4 space-y-2 text-sm text-green-700">
-			<li>Early detection for 141M people in underserved areas</li>
-			<li>Reduced outbreak response costs ($50-500M per major outbreak)</li>
-			<li>Wastewater surveillance is 10-100x more cost-effective than clinical testing at scale</li>
+		<ul class="mt-4 space-y-2 text-sm text-blue-700">
+			<li><strong>1,259 high-SVI counties</strong> have zero wastewater surveillance coverage</li>
+			<li><strong>141M people</strong> live in underserved high-SVI areas lacking monitoring infrastructure</li>
+			<li><strong>$172M investment</strong> could close this infrastructure gap</li>
 		</ul>
+		<div class="mt-4 pt-4 border-t border-blue-200">
+			<p class="text-sm text-blue-600 italic">
+				<strong>Note:</strong> This analysis documents an infrastructure disparity and estimates deployment costs.
+				Whether closing this gap would improve health outcomes or generate positive ROI requires further study
+				with longitudinal outcome data.
+			</p>
+		</div>
 	</div>
 
 	<!-- Top priority states -->

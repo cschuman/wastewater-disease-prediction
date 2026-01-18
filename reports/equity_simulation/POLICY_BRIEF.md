@@ -318,47 +318,53 @@ These counties combine high vulnerability, large populations, and zero current c
 
 ---
 
-## Cost-Benefit Analysis
+## Cost Analysis
 
-### Investment
-- **5-Year Total:** $602M
-- **Per capita (for 141M served):** $4.27 per person
-- **Comparison:** COVID testing cost $50-100 per person
+### Investment (Validated)
+- **5-Year Total:** $602M (estimated range: $480M-$750M depending on site-specific factors)
+- **Per capita (for 141M in target areas):** $4.27 per person
+- **Setup cost:** $172M (range: $140M-$220M)
+- **Annual operations:** $86M/year
 
-### Benefits
+### What Investment Provides (Validated)
+- **Infrastructure equity:** Closes 33% per-capita coverage gap
+- **Geographic coverage:** Brings monitoring to 1,259 currently unmonitored high-SVI counties
+- **Surveillance capacity:** 1,720 new monitoring sites in underserved areas
 
-#### Direct Public Health Value
-- **Early outbreak detection:** Detect community transmission 4-10 days before clinical data
-- **Prevented hospitalizations:** Estimated 10,000-50,000 per year (early intervention)
-- **Lives saved:** Difficult to quantify but significant in vulnerable populations
-- **Reduced disease burden:** Especially in high-SVI communities
+### Hypothesized Benefits (Require Further Study)
 
-#### Economic Value
-- **Outbreak response savings:** $50M-500M per major outbreak prevented
-- **Avoided productivity loss:** $100M-1B per major outbreak
-- **Healthcare cost reduction:** $500M-2B over 5 years
-- **Infrastructure value:** Permanent surveillance capacity
+The following benefits are plausible based on wastewater surveillance literature but have NOT been validated by this specific analysis:
 
-#### Equity Dividend
-- **Reduced health disparities:** Closes 44% surveillance gap
-- **Community trust:** Investment in long-neglected areas
-- **Infrastructure development:** Builds capacity in underserved regions
-- **Workforce development:** Jobs and training in vulnerable communities
+#### From General WBE Literature (Citations Needed)
+- Early outbreak detection may provide 4-14 day lead time vs clinical data
+- Population-level surveillance may complement individual testing
+- Cost per person covered may be lower than clinical testing at scale
 
-### Return on Investment
+#### NOT Calculated in This Analysis
+- ❌ Prevented hospitalizations (no outcome data)
+- ❌ Lives saved (no mortality linkage)
+- ❌ Outbreak response cost savings (no counterfactual)
+- ❌ ROI or cost-effectiveness ratio (requires outcome study)
 
-**Conservative Estimate:** Prevent 3 major outbreaks over 5 years
-- Cost: $602M
-- Savings: $150M-1.5B (outbreak response) + $300M-1B (productivity)
-- **ROI: 1:3 to 1:10**
+### What This Analysis Can and Cannot Claim
 
-**High-Value Scenario:** Prevent 5-10 outbreaks, enable earlier intervention
-- **ROI: 1:15 to 1:25**
+**What We Have Validated (This Analysis):**
+- Infrastructure equity gap exists: 33% fewer sites per capita in high-SVI counties (p=0.0001)
+- 1,259 high-SVI counties have zero coverage
+- Cost to close gap: $602M over 5 years (Scenario B)
+- Gap persists after controlling for urban/rural confounding (p=0.007)
 
-**Equity ROI:** Incalculable but substantial
-- Narrowing health disparities has long-term societal value
-- Building trust and infrastructure in underserved communities
-- Preventing preventable deaths in vulnerable populations
+**What Requires Further Study:**
+- Whether additional monitoring sites improve prediction accuracy in those communities
+- Whether improved prediction leads to earlier intervention
+- Whether earlier intervention reduces hospitalizations
+- What the actual return on investment would be
+
+**Literature Context (Not Validated Here):**
+General wastewater surveillance literature suggests 7-14 day early warning capability and potential cost-effectiveness versus clinical testing. However, this project has not independently validated these claims for the specific populations and contexts studied.
+
+**Recommendation:**
+This analysis supports investment in closing the infrastructure equity gap based on the principle that all communities deserve equal access to disease surveillance. ROI calculations should await longitudinal outcome studies.
 
 ---
 

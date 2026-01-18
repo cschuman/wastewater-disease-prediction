@@ -181,39 +181,41 @@ We modeled three policy scenarios to close the equity gap:
 
 ---
 
-## Cost-Benefit Analysis
+## Cost Analysis
 
 ### Investment Required (Scenario B)
 - **Setup:** $172M (one-time)
 - **Annual Operating:** $86M/year
 - **5-Year Total:** $602M
 
-### Value Delivered
+### What This Analysis Demonstrates
 
-**Public Health Impact:**
-- Early detection for **141M people** in currently underserved high-SVI areas
-- Reduced outbreak response costs (estimated $50-500M per major outbreak)
-- Decreased disease burden in vulnerable populations
-- Health equity improvement: closing 44% coverage gap
+**Infrastructure Equity Gap (Statistically Validated):**
+- High-SVI counties have **33% fewer monitoring sites per capita** (p=0.0001)
+- **1,259 high-SVI counties** have zero surveillance coverage
+- Gap persists after controlling for urban/rural differences (p=0.007)
+- **141M people** live in underserved high-SVI areas without monitoring
 
-**Economic Return:**
-- Prevented COVID-19 outbreaks saved $100M-$1B each through early intervention
-- Wastewater surveillance is 10-100x more cost-effective than clinical testing at scale
-- Early warning enables targeted interventions, avoiding broad lockdowns
+**Infrastructure Costs (Calculated):**
+- Setup cost per site: $100,000 (based on CDC/EPA guidance)
+- Annual operating cost per site: $50,000
+- Total 5-year cost for Scenario B: $602M
 
-**Equity Dividend:**
-- Reduces health disparities for 115M people living in high-SVI counties
-- Ensures vulnerable communities get equal protection
-- Builds public health infrastructure in chronically underinvested areas
+### What Remains Unvalidated
 
-### Cost of Inaction
-- Continued health disparities in disease surveillance
-- Delayed outbreak detection in vulnerable communities
-- Preventable disease transmission in highest-burden areas
-- Widening health equity gap
-- Lost economic productivity from preventable outbreaks
+**Causal Chain Not Established:**
+This analysis documents an infrastructure disparity and estimates deployment costs. The following causal links have NOT been validated by this project's data:
 
-**ROI Estimate:** For every $1 invested, save $5-15 in outbreak response and disease burden costs.
+1. ❓ Adding monitoring sites → Improved disease prediction accuracy
+2. ❓ Improved prediction → Earlier public health intervention
+3. ❓ Earlier intervention → Reduced hospitalizations/infections
+4. ❓ Reduced disease burden → Cost savings exceeding investment
+
+**ROI Claims Require Further Study:**
+Literature suggests wastewater surveillance provides 7-14 day early warning and may be cost-effective at scale. However, this project has not calculated ROI from its own data. Any cost-benefit estimates would require longitudinal outcome studies comparing areas with and without monitoring.
+
+### Honest Assessment
+This is an **infrastructure equity analysis**, not a cost-effectiveness study. We can confidently say vulnerable communities lack surveillance infrastructure. Whether closing this gap improves health outcomes is a reasonable hypothesis supported by general literature, but not validated by this specific analysis.
 
 ---
 
@@ -264,13 +266,23 @@ We modeled three policy scenarios to close the equity gap:
 
 ## Conclusion
 
-Closing the wastewater surveillance equity gap is both **achievable and urgent**.
+This analysis demonstrates that a statistically significant wastewater surveillance infrastructure gap exists between high-SVI and low-SVI communities. Closing this gap is both **achievable and quantifiable**.
 
-With an investment of **$172M over 5 years** (Scenario B), we can ensure that vulnerable communities—those bearing the highest disease burden—have equal access to life-saving early warning systems.
+### What We Can Confidently Say
+- High-SVI counties have **33% fewer monitoring sites per capita** (p=0.0001)
+- **1,259 high-SVI counties** have zero surveillance coverage
+- An investment of **$172M setup + $430M operating** (5-year total: $602M) could close this gap
+- The disparity persists after controlling for urban/rural differences
 
-The current 33% disparity in monitoring coverage means that when the next pandemic or outbreak occurs, high-SVI communities will once again be left behind. This is not just a public health failure—it's a moral imperative.
+### What Requires Further Study
+- Whether additional monitoring sites improve disease detection in these communities
+- Whether improved detection leads to better health outcomes
+- What the return on investment would be
 
-**The choice is clear:** Invest $172M now to build equity, or continue paying the much higher cost of health disparities, preventable outbreaks, and lost lives in our most vulnerable communities.
+### The Equity Argument
+The case for investment does not require proven ROI. The principle that all communities—regardless of socioeconomic status—deserve equal access to public health surveillance infrastructure is sufficient justification for closing documented disparities.
+
+If wastewater surveillance is valuable enough to deploy in low-SVI communities, high-SVI communities deserve equal access.
 
 ---
 

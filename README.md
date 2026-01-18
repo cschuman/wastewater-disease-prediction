@@ -15,7 +15,7 @@ Build a **multi-pathogen combined respiratory burden forecasting model** that pr
 
 ## Why This Matters
 
-- Wastewater surveillance provides **10-17 days lead time** over clinical data
+- Literature suggests wastewater surveillance may provide **7-14 days lead time** over clinical data
 - Hospitals manage **total bed capacity**, not individual diseases
 - No existing model predicts combined respiratory burden from multi-pathogen wastewater signals
 

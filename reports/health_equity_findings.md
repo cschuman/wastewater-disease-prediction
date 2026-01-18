@@ -480,25 +480,39 @@ We modeled three policy scenarios:
 - Sites: ~430 new locations
 - Budget: $43M setup
 
-### Cost-Benefit Summary
+### Cost Summary
 
-| Investment | Benefit |
-|------------|---------|
-| $172M setup | Early detection for 141M people in underserved areas |
-| $86M/year operating | Reduced outbreak response costs ($50-500M per major outbreak) |
-| **ROI estimate** | **$5-15 saved per $1 invested** |
+| Investment | What It Provides |
+|------------|------------------|
+| $172M setup | Infrastructure to monitor 1,259 currently unmonitored high-SVI counties |
+| $86M/year operating | Ongoing surveillance operations for 1,720 new sites |
+| **Total 5-year cost** | **$602M** |
+
+**Note on ROI:** This analysis calculates infrastructure costs but does not estimate health outcome benefits or ROI. Whether closing the infrastructure gap improves disease prediction and health outcomes in these communities requires longitudinal study. The investment case rests on equity (all communities deserve equal surveillance access), not yet-unvalidated cost-effectiveness claims.
 
 ---
 
 ## Limitations
 
+### Addressed in This Analysis
 1. ~~**State-level granularity**: County or sewershed-level analysis would provide finer resolution~~ **ADDRESSED**: County analysis completed
-2. ~~**No causal identification**: Observational analysis cannot establish causality~~ **PARTIALLY ADDRESSED**: DiD analysis provides quasi-experimental evidence
+2. ~~**No causal identification**: Observational analysis cannot establish causality~~ **PARTIALLY ADDRESSED**: DiD analysis provides quasi-experimental evidence for infrastructure effects
 3. ~~**Urban/rural confounding**: Gap could be explained by rural infrastructure limitations~~ **ADDRESSED**: Confounding analysis shows effect persists in urban counties
+
+### Remaining Limitations
 4. **Percentile data**: Using CDC-computed percentiles rather than raw concentrations
 5. **Single pandemic phase**: Data covers post-emergency phase only (2024-2025)
 6. **SVI at state level**: State-level SVI averages mask within-state variation
 7. **New site noise**: Cannot distinguish calibration issues from inherent variance
+
+### Critical Scope Limitation
+8. **No health outcome linkage**: This analysis documents infrastructure disparities and estimates deployment costs. It does NOT establish:
+   - Whether adding monitoring sites improves disease prediction accuracy
+   - Whether improved prediction leads to earlier public health intervention
+   - Whether earlier intervention reduces hospitalizations or deaths
+   - What the return on investment would be
+
+   These causal links require longitudinal outcome studies comparing communities before and after monitoring deployment, which is beyond the scope of this infrastructure equity analysis.
 
 ---
 
